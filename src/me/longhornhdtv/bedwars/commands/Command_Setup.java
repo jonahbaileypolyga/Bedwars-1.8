@@ -36,8 +36,15 @@ public class Command_Setup implements CommandExecutor{
 			}
 		}
 		if(args.length == 0) {
-			p.sendMessage(Main.getPrefix() + "Hier kannst du was hineinschreiben mit der Prefix");
-			p.sendMessage("Hier ist es ohne Prefix.");
+			p.sendMessage("---------Setup---------");
+			p.sendMessage("");
+			p.sendMessage("§e/setup createGame [maxplayers] [Name des Spieles] erstelle den Server.");
+			p.sendMessage("§e/setup setlobby setze den Lobby spawn.");
+			p.sendMessage("§e/setup setSpawnPosition [TeamFarbe Gelb;Rot;Grün;Lila] um den Teamspawn zu setzen.");
+			p.sendMessage("§e/setup setBed [TeamFarbe] um das Bett zu setzen.");
+			p.sendMessage("§e/setup setspawner [Bronze;Silver;Gold] um die Spawner zu setzen.");
+			p.sendMessage("");
+			p.sendMessage("-------Setup-End-------");
 			return true;
 		}else
 		if(args.length == 1) {
