@@ -14,13 +14,14 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.longhornhdtv.bedwars.commands.Command_Setup;
 import me.longhornhdtv.bedwars.utils.Game;
 import me.longhornhdtv.bedwars.utils.Map;
 
 public class Main extends JavaPlugin{
 		
 	public static ConsoleCommandSender CCS = Bukkit.getConsoleSender();
-	private static String prefix = "§8| §BedWars &8* ";
+	private static String prefix = "§8| §eBedWars §8* ";
 	private static File MainFolder = new File("plugins//Bedwars");
 	private static File MainConfig = new File(MainFolder + "//config.yml");
 	public static File GameFile = new File(MainFolder + "//game.data");
@@ -33,7 +34,9 @@ public class Main extends JavaPlugin{
 	public void onEnable() {
 		if(isDebug) {
 //			this.getCommand("Bedwars").setExecutor(new MainCommand());
-			CCS.sendMessage("§8| §BedWars &8*  §aIst nun im Developer Modus.");
+			game = new Game(GameFile);
+			this.getCommand("setup").setExecutor(new Command_Setup());
+			CCS.sendMessage("§8| §eBedWars §8*  §aIst nun im Developer Modus.");
 			return;
 		}
 		if(!MainFolder.exists()) {
@@ -55,12 +58,12 @@ public class Main extends JavaPlugin{
 			this.cfg = cfg;
 		}
 		game = new Game(GameFile);
-		CCS.sendMessage("§8| §BedWars &8*  §aWurde geladen und Aktiviert !");
+		CCS.sendMessage("§8| §eBedWars §8*  §aWurde geladen und Aktiviert !");
 	}
 
 	@Override
 	public void onDisable() {
-		CCS.sendMessage("§8| §BedWars &8*  §cWurde deaktiviert !");
+		CCS.sendMessage("§8| §eBedWars §8*  §cWurde deaktiviert !");
 		
 		
 		

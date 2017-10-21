@@ -133,9 +133,11 @@ public class JoinListener implements Listener{
 	@EventHandler
 	public void onDown(PlayerMoveEvent e) {
 		if(e.getPlayer().getLocation().getBlockY() < 0 && (Main.game.getGameState().equals(GameState.LOBBY) || Main.game.getGameState().equals(GameState.FULL_LOBBY))) {
-			e.getPlayer().teleport(Main.game.lobbyLocation);
-			e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
-			e.getPlayer().playEffect(e.getPlayer().getLocation(), Effect.ENDER_SIGNAL, 0);
+			if(!(Main.game.lobbyLocation != null)) {
+				e.getPlayer().teleport(Main.game.lobbyLocation);
+				e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
+				e.getPlayer().playEffect(e.getPlayer().getLocation(), Effect.ENDER_SIGNAL, 0);
+			}
 		}
 	}
 }

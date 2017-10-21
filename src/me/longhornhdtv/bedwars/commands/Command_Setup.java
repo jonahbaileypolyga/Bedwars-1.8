@@ -27,29 +27,23 @@ public class Command_Setup implements CommandExecutor{
 			
 		}
 		Player p = (Player) sender;
-		for(Map maps : Main.game.getAllMaps()) {
-			if(maps.getMapName().equalsIgnoreCase(p.getLocation().getWorld().getName())) {
-				currentMap = maps;
-				break;
+		if(!Main.game.isGameReady) {
+			for(Map maps : Main.game.getAllMaps()) {
+				if(maps.getMapName().equalsIgnoreCase(p.getLocation().getWorld().getName())) {
+					currentMap = maps;
+					break;
+				}
 			}
 		}
 		if(args.length == 0) {
-			if(args[0].equalsIgnoreCase("setLobby")) {
-				
-				return true;
-			}else
-			if(args[0].equalsIgnoreCase("setHub")){
-				
-				return true;
-			}else{
-				
-				return true;
-			}
-			
+			p.sendMessage(Main.getPrefix() + "Hier kannst du was hineinschreiben mit der Prefix");
+			p.sendMessage("Hier ist es ohne Prefix.");
+			return true;
 		}else
 		if(args.length == 1) {
-			if(args[0].equalsIgnoreCase("setHub")) {
-				
+			if(args[0].equalsIgnoreCase("setLobby")) {
+				Main.game.lobbyLocation = p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D);
+				p.sendMessage("Du hast erfolgreich die Lobby gesetzt.");
 				return true;
 			}else{
 				
@@ -67,6 +61,10 @@ public class Command_Setup implements CommandExecutor{
 		}else
 		if(args.length == 3) {
 			if(args[0].equalsIgnoreCase("createGame")) {
+				if(!p.hasPermission("bw.create")) {
+					p.sendMessage("Du hast keine Rechte auf diesem Befehl.");
+					return true;
+				}
 				int maxPlayers = 0;
 				String name = "";
 				if(!Main.game.isGameReady) {

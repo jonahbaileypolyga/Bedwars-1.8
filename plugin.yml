@@ -1,7 +1,7 @@
 name: Bedwars
-version: 0.1D
-main: me.longhornhdtv.main.Main
+version: 0.0.1
+main: me.longhornhdtv.bedwars.main.Main
 commands:
-  Bedwars:
+  setup:
     description: The Main Command of Bedwars
-    usage: </BedWars>
+    usage: </setup>
