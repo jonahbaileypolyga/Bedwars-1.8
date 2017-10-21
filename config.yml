@@ -1,0 +1,27 @@
+# {player} = Name of the Player
+# {teamcolor} = Get the Team Prefix
+# {message} = Get the Message from the Player
+# {all} = The info that the message goes to all
+Config:
+   lobbytime: 60
+   lobby-gamemode: 2
+   game-time: 90
+   Build-mode: bw.Build
+   Supporter-Permission: bw.support
+   JoinonFullLobbys: bw.premium
+   hearts-on-death: true
+   die-on-void: true
+# Message in the Lobby Phase
+   lobby-chatformat: "{teamcolor}{player} » {message}"
+# Messag to all
+   ingame-chatformat-all: "{all} {teamcolor}{player} » {message}"
+# Message in the Team chat
+   ingame-chatformat: "{teamcolor}{player} » {message}"
+   bed-sound: ENDERDRAGON_GROWL
+   chat-to-all-prefix:
+   - '@'
+   - '@a'
+   - '@all'
+   seperate-spectator-chat: true
+   
+   

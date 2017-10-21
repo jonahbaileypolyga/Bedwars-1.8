@@ -26,6 +26,7 @@ public class Game {
 	public boolean isGameReady;
 	public boolean isBuildMode;
 	public boolean isDebug = true;
+	public Location lobbyLocation;
 	private File file;
 	private GameState gameState;
 	
@@ -37,12 +38,13 @@ public class Game {
 				isGameReady = false;
 				isBuildMode = false;
 			}else{
-				this.isGameReady = true;
+//				this.isGameReady = true;
 				this.file = file;
 				YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 				this.isBuildMode = cfg.getBoolean("Game.BuildMode");
 				this.name = cfg.getString("Game.Name");
 				this.maxPlayers = cfg.getInt("Game.MaxPlayers");
+				this.lobbyLocation = new Location(Bukkit.getWorld(cfg.getString("Game.Lobby.World")), cfg.getDouble("Game.Lobby.X"), cfg.getDouble("Game.Lobby.Y"), cfg.getDouble("Game.Lobby.Z"));
 				for(String name : cfg.getConfigurationSection("Game.Maps").getKeys(false)) {
 					boolean b1 = false;
 					Map map = new Map(name);
@@ -117,6 +119,10 @@ public class Game {
 		this.maxPlayers = maxPlayer;
 	}
 	
+	public void setGameName(String name) {
+		this.name = name;
+	}
+	
 	public void removeMap(Map map) {
 		if(maps.contains(map)) {
 			maps.remove(map);
@@ -175,6 +181,10 @@ public class Game {
 			}
 		}
 		return null;
+	}
+	
+	public String getGameName() {
+		return this.name;
 	}
 	
 	private boolean checkIsGameReady() {

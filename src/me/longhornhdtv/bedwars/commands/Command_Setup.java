@@ -20,8 +20,7 @@ public class Command_Setup implements CommandExecutor{
 	//setup setBed (Team)
 	//setup setSpawner (Gold,Silver,Bronzer)
 	//setup setLobby
-	//setup createGame (Anzahl der Maximalen Spieler) (Anzahl der Teams) (VoteItemID:[MetaID]) 
-	@SuppressWarnings("deprecation")
+	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels)
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String lebel, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -67,70 +66,54 @@ public class Command_Setup implements CommandExecutor{
 			}
 		}else
 		if(args.length == 3) {
+			if(args[0].equalsIgnoreCase("createGame")) {
+				int maxPlayers = 0;
+				String name = "";
+				if(!Main.game.isGameReady) {
+					if(Main.GameFile.delete()) {
+						name = args[2];
+						try {
+							maxPlayers = Integer.parseInt(args[1]);
+						} catch(Exception e) {
+							p.sendMessage("Du musst eine Zahl bei der Maximalen Anzahl der Spieler für denn Server eingeben.");
+							return true;
+						}
+						Main.game.setMaxPlayers(maxPlayers);
+						Main.game.setGameName(name);
+						p.sendMessage(Main.getPrefix() + "Du hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
+						return true;
+					}else{
+						if(!Main.GameFile.exists()) {
+							name = args[2];
+							try {
+								maxPlayers = Integer.parseInt(args[1]);
+							} catch(Exception e) {
+								p.sendMessage("Du musst eine Zahl bei der Maximalen Anzahl der Spieler für denn Server eingeben.");
+								return true;
+							}
+							Main.game.setMaxPlayers(maxPlayers);
+							Main.game.setGameName(name);
+							p.sendMessage(Main.getPrefix() + "Du hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
+							if(Main.isDebug) {
+								Main.CCS.sendMessage(Main.getPrefix() + " §6DEBUG §0> §aStr(name): " + Main.game.getGameName() + " Int(maxPlayer): " + Main.game.getMaxPlayers()); 
+							}
+							return true;
+						}else{
+							p.sendMessage("Es gab ein Error: Command_Setup: 80|delete GameFile execption");
+							return true;
+						}
+					}
+				}else{
+					p.sendMessage("Du hast auf diesem Server schon ein Spiel erstellt. Bitte erstelle Maps.");
+					return true;
+				}
+			}else
 			if(args[0].equalsIgnoreCase("setSpawnPosition")) {
 				
 				return true;
 			}else
 			if(args[0].equalsIgnoreCase("setBed")) {
 				
-				return true;
-			}else{
-				
-				return true;
-			}
-		}else
-		if(args.length == 4) {
-			if(args[0].equalsIgnoreCase("createGame")) {
-				int countofmaxplayers = 0;
-				int countofteams = 0;
-				int voteitemid = 0;
-				int metaid = 0;
-				
-				try {
-					countofmaxplayers = Integer.getInteger(args[1]);
-					countofteams = Integer.getInteger(args[2]);
-				} catch(Exception e) {
-					p.sendMessage("§eBitte gebe die Zahlen ein bei (Anzahl der Maximalen Spieler) ,(Anzahl der Teams) und (VoteItemID:[MetaID]).");
-					return true;
-				}
-				if(args[3].contains(":")) {
-					try {
-						voteitemid = Integer.getInteger(args[3]);
-					} catch(Exception e) {
-						p.sendMessage("§eBitte gebe die Zahlen ein bei (Anzahl der Maximalen Spieler) ,(Anzahl der Teams) und (VoteItemID:[MetaID]).");
-						return true;
-					}
-				}else{
-					String[] split = args[3].split(":");
-					try {
-						voteitemid = Integer.getInteger(split[0]);
-						metaid = Integer.getInteger(split[1]);
-					} catch(Exception e) {
-						p.sendMessage("§eBitte gebe die Zahlen ein bei (Anzahl der Maximalen Spieler) ,(Anzahl der Teams) und (VoteItemID:[MetaID]).");
-						return true;
-					}
-				}
-				if(countofmaxplayers == 0 || countofteams== 0) {
-					p.sendMessage("&eDu kannst §ckein Spiel §emit einer Anzahl von 0 Teams oder 0 Maximalen Spieler erstellen.");
-					return true;
-				}
-				
-				if(Material.getMaterial(voteitemid) != null) {
-					if(currentMap != null) {
-						p.sendMessage("§eAuf dieser Welt gibt es schon ein Game.");
-						return true;
-					}
-					
-					
-					if(countofmaxplayers > 16) {
-						p.sendMessage("§eDu kannst nicht mehr als 16 Unterschiedliche Teams erstellen.");
-						return true;
-					}
-					
-				}else{
-					p.sendMessage("§eEs gibt kein Item mit der ID §e" + voteitemid + "$e in Minecraft.");
-					return true;
-				}
 				return true;
 			}else{
 				

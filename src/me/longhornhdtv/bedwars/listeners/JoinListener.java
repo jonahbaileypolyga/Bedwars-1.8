@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -28,7 +32,6 @@ public class JoinListener implements Listener{
 				Main.game.setGameState(GameState.LOBBY);
 				e.setResult(Result.ALLOWED);
 				e.allow();
-				e.getPlayer().getAddress().getHos
 			}else{
 				if(e.getPlayer().hasPermission(Main.getMainConfig().getString("Config.JoinonFullLobbys"))){
 					Main.game.setGameState(GameState.FULL_LOBBY);
@@ -76,8 +79,12 @@ public class JoinListener implements Listener{
 		if(!Main.game.isGameReady || Main.game.isBuildMode) {
 			e.setMaxPlayers(20);
 			e.setMotd("§4WARTUNG");
-		}
-		if(Main.game.getGameState().equals(GameState.LOBBY) || Main.game.getGameState().equals(GameState.FULL_LOBBY)) {
+		}else
+		if(Main.game.getGameState().equals(GameState.FULL_LOBBY)) {
+			e.setMaxPlayers(Main.game.getMaxPlayers());
+			e.setMotd("§6LOBBY");
+		}else
+		if(Main.game.getGameState().equals(GameState.LOBBY)) {
 			e.setMaxPlayers(Main.game.getMaxPlayers());
 			e.setMotd("§aLOBBY");
 		}else
@@ -119,6 +126,16 @@ public class JoinListener implements Listener{
 			quititem.setItemMeta(meta1);
 			p.getInventory().addItem(quititem);
 			p.getInventory().setItem(8, quititem);
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	@EventHandler
+	public void onDown(PlayerMoveEvent e) {
+		if(e.getPlayer().getLocation().getBlockY() < 0 && (Main.game.getGameState().equals(GameState.LOBBY) || Main.game.getGameState().equals(GameState.FULL_LOBBY))) {
+			e.getPlayer().teleport(Main.game.lobbyLocation);
+			e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.ENDERMAN_TELEPORT, 1.0F, 1.0F);
+			e.getPlayer().playEffect(e.getPlayer().getLocation(), Effect.ENDER_SIGNAL, 0);
 		}
 	}
 }

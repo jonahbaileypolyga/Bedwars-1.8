@@ -23,7 +23,7 @@ public class Main extends JavaPlugin{
 	private static String prefix = "§8| §BedWars &8* ";
 	private static File MainFolder = new File("plugins//Bedwars");
 	private static File MainConfig = new File(MainFolder + "//config.yml");
-	private static File GameFile = new File(MainFolder + "//game.data");
+	public static File GameFile = new File(MainFolder + "//game.data");
 	private static YamlConfiguration cfg;
 	public static Game game;
 	public static boolean isDebug = true;
