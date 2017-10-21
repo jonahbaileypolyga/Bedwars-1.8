@@ -36,7 +36,7 @@ public class Command_Setup implements CommandExecutor{
 			}
 		}
 		if(args.length == 0) {
-			p.sendMessage("---------Setup---------");
+			p.sendMessage("§e---------Setup---------");
 			p.sendMessage("");
 			p.sendMessage("§e/setup createGame [maxplayers] [Name des Spieles] erstelle den Server.");
 			p.sendMessage("§e/setup setlobby setze den Lobby spawn.");
@@ -44,7 +44,7 @@ public class Command_Setup implements CommandExecutor{
 			p.sendMessage("§e/setup setBed [TeamFarbe] um das Bett zu setzen.");
 			p.sendMessage("§e/setup setspawner [Bronze;Silver;Gold] um die Spawner zu setzen.");
 			p.sendMessage("");
-			p.sendMessage("-------Setup-End-------");
+			p.sendMessage("§e-------Setup-End-------");
 			return true;
 		}else
 		if(args.length == 1) {
