@@ -3,14 +3,14 @@ package me.longhornhdtv.bedwars.utils;
 import org.bukkit.Material;
 
 public enum Teams {
-	BLACK(Material.WOOL, 15, "§0SCHWARTZ"),
-	WHITE(Material.WOOL, 0, "§fWEISS"),
-	RED(Material.WOOL, 14, "§cROT"),
-	YELLOW(Material.WOOL, 4, "§eGELB"),
-	GREEN(Material.WOOL, 5, "§aGRÜN"),
-	PURPLE(Material.WOOL, 10, "§5LILA"),
-	ORANGE(Material.WOOL, 1, "§6ORANGE"),
-	BLUE(Material.WOOL, 11, "§9BLAU");
+	BLACK(Material.STAINED_HARDENED_CLAY, 15, "§0SCHWARTZ"),
+	WHITE(Material.STAINED_HARDENED_CLAY, 0, "§fWEISS"),
+	RED(Material.STAINED_HARDENED_CLAY, 14, "§cROT"),
+	YELLOW(Material.STAINED_HARDENED_CLAY, 4, "§eGELB"),
+	GREEN(Material.STAINED_HARDENED_CLAY, 5, "§aGRÜN"),
+	PURPLE(Material.STAINED_HARDENED_CLAY, 10, "§5LILA"),
+	ORANGE(Material.STAINED_HARDENED_CLAY, 1, "§6ORANGE"),
+	BLUE(Material.STAINED_HARDENED_CLAY, 11, "§9BLAU");
 	
 	//8x1 Schwartz Weiß Rot Gelb Grün Lila Orange Blau
 	//2x4 BLau Gelb Rot Lila
