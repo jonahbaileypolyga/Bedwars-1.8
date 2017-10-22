@@ -10,7 +10,7 @@ public enum Teams {
 	GREEN(Material.WOOL, 5, "§aGRÜN"),
 	PURPLE(Material.WOOL, 10, "§5LILA"),
 	ORANGE(Material.WOOL, 1, "§6ORANGE"),
-	BLUE(Material.WOOL, 11, "§9BLAU"),
+	BLUE(Material.WOOL, 11, "§9BLAU");
 	
 	//8x1 Schwartz Weiß Rot Gelb Grün Lila Orange Blau
 	//2x4 BLau Gelb Rot Lila

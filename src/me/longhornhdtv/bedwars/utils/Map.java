@@ -42,6 +42,21 @@ public class Map {
 		}
 	}
 	
+	public Team getTeam(Teams team) {
+		for(Team teams : this.teams) {
+			if(teams.teamsenum.equals(team)) {
+				return teams;
+			}else{
+				continue;
+			}
+		}
+		return null;
+	}
+	
+	public ArrayList<Team> getTeams() {
+		return this.teams;
+	}
+	
 	public void addTeam(Team team) {
 		this.teams.add(team);
 	}

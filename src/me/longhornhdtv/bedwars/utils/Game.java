@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
@@ -160,6 +161,15 @@ public class Game {
 	
 	public int getMaxPlayers() {
 		return maxPlayers;
+	}
+	
+	public Team getTeamOfBed(Block bed) {
+		for(Team teams : currentMap.getTeams()) {
+			if(teams.getBedBack().equals(bed) || teams.getBedHead().equals(bed)) {
+				return teams;
+			}
+		}
+		return null;
 	}
 	
 	public void setGameState(GameState gameState) {
