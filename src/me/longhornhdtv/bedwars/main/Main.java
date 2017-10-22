@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -114,5 +115,19 @@ public class Main extends JavaPlugin{
 		}
 		File n = new File(to.getAbsolutePath() + "/" + file.getName());
 		Files.copy(file.toPath(), n.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	}
+	
+	public static boolean loadWorld(String name) {
+		if(!Main.getPlugin(Main.class).getServer().getWorlds().contains((Main.getPlugin(Main.class).getServer().getWorld(name)))) {
+			new WorldCreator(name).createWorld();
+			return true;
+		}
+		return false;
+	}
+	
+	public static void unloadWold(String name) {
+		if(Main.getPlugin(Main.class).getServer().getWorlds().contains((Main.getPlugin(Main.class).getServer().getWorld(name)))) {
+			
+		}
 	}
 }

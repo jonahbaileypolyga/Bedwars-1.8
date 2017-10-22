@@ -1,18 +1,41 @@
 package me.longhornhdtv.bedwars.utils;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 public class Map {
 	
-	private String MapName;
+	private String mapName;
 	private ItemStack voteItem;
 	private ArrayList<Spawner> spawners = new ArrayList<>();
 	private ArrayList<Team> teams;
+	private String realMapName;
+	private HashMap<Location, Block> changesBlock = new HashMap<>();
 	
 	public Map(String mapName) {
-		this.MapName = mapName;
+		this.mapName = mapName;
+	}
+	
+	public Map(String mapName, String realMapName) {
+		this.mapName = mapName;
+		this.realMapName = realMapName;
+	}
+	
+	public void setMapname(String mapName) {
+		this.mapName = mapName;
+	}
+	
+	public void setFolderMap(String realMapName) {
+		this.realMapName = realMapName;
+	}
+	
+	public String getRealMapName() {
+		return this.realMapName;
 	}
 	
 	public void addVoteItem(ItemStack item) {
@@ -89,6 +112,14 @@ public class Map {
 	}
 	
 	public String getMapName() {
-		return MapName;
+		return mapName;
+	}
+	
+	public void addBlock(Location loc, Block before) {
+		this.changesBlock.put(loc, before);
+	}
+	
+	public HashMap<Location, Block> getBloecks() {
+		return this.changesBlock;
 	}
 }

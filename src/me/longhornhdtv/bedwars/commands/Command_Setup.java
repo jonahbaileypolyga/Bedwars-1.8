@@ -6,16 +6,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Material;
-import org.bukkit.TravelAgent;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Bed;
-
-import com.avaje.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
 import me.longhornhdtv.bedwars.main.Main;
 import me.longhornhdtv.bedwars.utils.Map;
@@ -27,11 +25,13 @@ public class Command_Setup implements CommandExecutor{
 	private Map currentMap = null;
 	
 	//setup setHub
+	@SuppressWarnings("deprecation")
 	//setup setSpawnPosition (Team)
 	//setup setBed (Team)
 	//setup setSpawner (Gold,Silver,Bronzer)
 	//setup setLobby
-	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels)
+	//setup addMap (Name) (VoteItemID:[MetaID])  - Permission: bw.addMap
+	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels) - Permission: bw.create
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String lebel, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -78,6 +78,46 @@ public class Command_Setup implements CommandExecutor{
 			}
 		}else
 		if(args.length == 3) {
+			if(args[0].equalsIgnoreCase("addMap")) {
+				if(!p.hasPermission("bw.addMap")) {
+					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
+					return true;
+				}
+				if(currentMap != null) {
+					p.sendMessage("Diese Map wo du dich befindest wurde schon hinzugefügt.");
+					return true;
+				}
+				String name = args[1];
+				int voteItemID = 0;
+				int metaID = 0;
+				
+				if(args[2].contains(":")) {
+					try {
+						String[] split = args[2].split(":");
+						voteItemID = Integer.parseInt(split[0]);
+						metaID = Integer.parseInt(split[1]);
+					} catch(Exception e) {
+						p.sendMessage("Du musst eine Zahl bei VoteItemID:MetaID eingeben.");
+						return true;
+					}
+				}else{
+					try {
+						voteItemID = Integer.parseInt(args[2]);
+					} catch(Exception e) {
+						p.sendMessage("Du musst eine Zahl bei VoteItemID eingeben.");
+						return true;
+					}
+				}
+				if(Material.getMaterial(voteItemID) != null) { 
+					Map map = new Map(name, p.getLocation().getWorld().getName());
+					map.addVoteItem(new ItemStack(Material.getMaterial(voteItemID), 1, (short) metaID));
+					Main.game.addMap(map);
+					return true;
+				}else{
+					p.sendMessage("Leider gibt es kein Item mit der ID(" + voteItemID + ").");
+					return true;
+				}
+			}
 			if(args[0].equalsIgnoreCase("createGame")) {
 				if(!p.hasPermission("bw.create")) {
 					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");

@@ -3,6 +3,7 @@ package me.longhornhdtv.bedwars.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -47,8 +48,9 @@ public class Game {
 				this.maxPlayers = cfg.getInt("Game.MaxPlayers");
 				this.lobbyLocation = new Location(Bukkit.getWorld(cfg.getString("Game.Lobby.World")), cfg.getDouble("Game.Lobby.X"), cfg.getDouble("Game.Lobby.Y"), cfg.getDouble("Game.Lobby.Z"));
 				for(String name : cfg.getConfigurationSection("Game.Maps").getKeys(false)) {
+					String unrealName = cfg.getString("Game.Maps" + name + ".Name");
 					boolean b1 = false;
-					Map map = new Map(name);
+					Map map = new Map(unrealName, name);
 					for(Map map2 : this.maps) {
 						if(map2.getMapName().equals(map)) {
 							b1 = true;
@@ -65,7 +67,15 @@ public class Game {
 						continue;
 					}
 				}
+				
+				while(this.maps.size() > 3) {
+					Random rnd = new Random();
+					Map removeMap = this.maps.get(rnd.nextInt(this.maps.size()));
+					Main.unloadWold(removeMap.getRealMapName());
+					this.maps.remove(removeMap);
+				}
 				for(Map map : this.maps) {
+					Main.loadWorld(map.getRealMapName());
 					ItemStack voteItem = cfg.getItemStack("Game.Maps." + map.getMapName() + ".VoteItem");
 					ArrayList<Spawner> spawners = new ArrayList<>();
 					for(String SpawnerID : cfg.getConfigurationSection("Game.Maps." + map.getMapName() + ".Spawners").getKeys(false)) {
@@ -93,13 +103,13 @@ public class Game {
 		if(!maps.contains(map) || maps.isEmpty()) {
 			if(Bukkit.getWorld(map.getMapName()) != null) {
 				Map map2 = new Map(Bukkit.getWorld(map.getMapName()).getName());
-				for(Spawner spawner : map.getAllSpawnerfromtheMap()) {
-					map2.addSpawner(spawner);
-				}
-				if(map2.getAllSpawnerfromtheMap() == null) {
-					Bukkit.broadcastMessage(Main.getPrefix() + "§4Map konnte nicht hinzugefüt werden, weil kein Spawner gesetzt wurde.");
-					return;
-				}
+//				for(Spawner spawner : map.getAllSpawnerfromtheMap()) {
+//					map2.addSpawner(spawner);
+//				}
+//				if(map2.getAllSpawnerfromtheMap() == null) {
+//					Bukkit.broadcastMessage(Main.getPrefix() + "§4Map konnte nicht hinzugefüt werden, weil kein Spawner gesetzt wurde.");
+//					return;
+//				}
 				if(!(map.getVoteItem() == null)) {
 					map2.addVoteItem(map.getVoteItem());
 				}else{
