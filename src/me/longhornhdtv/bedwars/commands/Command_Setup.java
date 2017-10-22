@@ -50,6 +50,7 @@ public class Command_Setup implements CommandExecutor{
 			p.sendMessage("§e---------Setup---------");
 			p.sendMessage("");
 			p.sendMessage("§e/setup createGame [maxPlayers] [Name des Spieles] erstelle den Server.");
+			p.sendMessage("§e/setup addMap [MapName] [VoteItem] um eine Map zu erstellen §c!Achte darauf das du dich in der Map befinden musst!§e. ");
 			p.sendMessage("§e/setup setlobby setze den Lobby Spawn.");
 			p.sendMessage("§e/setup setSpawnPosition [TeamFarbe  Schwartz,Weiß,Rot,Gelb,Grün,Lila,Orange,Blau] um den Teamspawn zu setzen.");
 			p.sendMessage("§e/setup setBed [TeamFarbe] um das Bett zu setzen.");
@@ -84,7 +85,7 @@ public class Command_Setup implements CommandExecutor{
 					return true;
 				}
 				if(currentMap != null) {
-					p.sendMessage("Diese Map wo du dich befindest wurde schon hinzugefügt.");
+					p.sendMessage("§eDiese Map wo du dich befindest wurde schon hinzugefügt.");
 					return true;
 				}
 				String name = args[1];
@@ -97,14 +98,14 @@ public class Command_Setup implements CommandExecutor{
 						voteItemID = Integer.parseInt(split[0]);
 						metaID = Integer.parseInt(split[1]);
 					} catch(Exception e) {
-						p.sendMessage("Du musst eine Zahl bei VoteItemID:MetaID eingeben.");
+						p.sendMessage("§eDu musst eine Zahl bei VoteItemID:MetaID eingeben.");
 						return true;
 					}
 				}else{
 					try {
 						voteItemID = Integer.parseInt(args[2]);
 					} catch(Exception e) {
-						p.sendMessage("Du musst eine Zahl bei VoteItemID eingeben.");
+						p.sendMessage("§eDu musst eine Zahl bei VoteItemID eingeben.");
 						return true;
 					}
 				}
@@ -114,7 +115,7 @@ public class Command_Setup implements CommandExecutor{
 					Main.game.addMap(map);
 					return true;
 				}else{
-					p.sendMessage("Leider gibt es kein Item mit der ID(" + voteItemID + ").");
+					p.sendMessage("§eLeider gibt es kein Item mit der ID(" + voteItemID + ").");
 					return true;
 				}
 			}
@@ -136,7 +137,7 @@ public class Command_Setup implements CommandExecutor{
 						}
 						Main.game.setMaxPlayers(maxPlayers);
 						Main.game.setGameName(name);
-						p.sendMessage(Main.getPrefix() + "Du hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
+						p.sendMessage(Main.getPrefix() + "§eDu hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
 						return true;
 					}else{
 						if(!Main.GameFile.exists()) {
@@ -149,7 +150,7 @@ public class Command_Setup implements CommandExecutor{
 							}
 							Main.game.setMaxPlayers(maxPlayers);
 							Main.game.setGameName(name);
-							p.sendMessage(Main.getPrefix() + "Du hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
+							p.sendMessage(Main.getPrefix() + "§eDu hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
 							if(Main.isDebug) {
 								Main.CCS.sendMessage(Main.getPrefix() + " §6DEBUG §0> §aStr(name): " + Main.game.getGameName() + " Int(maxPlayer): " + Main.game.getMaxPlayers()); 
 							}
