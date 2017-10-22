@@ -80,7 +80,7 @@ public class Command_Setup implements CommandExecutor{
 		if(args.length == 3) {
 			if(args[0].equalsIgnoreCase("createGame")) {
 				if(!p.hasPermission("bw.create")) {
-					p.sendMessage("Du hast keine Rechte auf diesem Befehl.");
+					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
 					return true;
 				}
 				int maxPlayers = 0;
@@ -91,7 +91,7 @@ public class Command_Setup implements CommandExecutor{
 						try {
 							maxPlayers = Integer.parseInt(args[1]);
 						} catch(Exception e) {
-							p.sendMessage("Du musst eine Zahl bei der Maximalen Anzahl der Spieler für denn Server eingeben.");
+							p.sendMessage("§eDu musst eine Zahl bei der Maximalen Anzahl der Spieler für denn Server eingeben.");
 							return true;
 						}
 						Main.game.setMaxPlayers(maxPlayers);
@@ -104,7 +104,7 @@ public class Command_Setup implements CommandExecutor{
 							try {
 								maxPlayers = Integer.parseInt(args[1]);
 							} catch(Exception e) {
-								p.sendMessage("Du musst eine Zahl bei der Maximalen Anzahl der Spieler für denn Server eingeben.");
+								p.sendMessage("§eDu musst eine Zahl bei der Maximalen Anzahl der Spieler für denn Server eingeben.");
 								return true;
 							}
 							Main.game.setMaxPlayers(maxPlayers);
@@ -115,12 +115,12 @@ public class Command_Setup implements CommandExecutor{
 							}
 							return true;
 						}else{
-							p.sendMessage("Es gab ein Error: Command_Setup: 80|delete GameFile execption");
+							p.sendMessage("§eEs gab ein Error: Command_Setup: 80|delete GameFile execption");
 							return true;
 						}
 					}
 				}else{
-					p.sendMessage("Du hast auf diesem Server schon ein Spiel erstellt. Bitte erstelle Maps.");
+					p.sendMessage("§eDu hast auf diesem Server schon ein Spiel erstellt. Bitte erstelle Maps.");
 					return true;
 				}
 			}else
@@ -137,12 +137,12 @@ public class Command_Setup implements CommandExecutor{
 						}
 					}
 					if(teams == null) {
-						p.sendMessage("Du musst ein Name vo den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen. ");
+						p.sendMessage("§eDu musst ein Name vo den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen. ");
 						return true;
 					}
 					Team team = currentMap.getTeam(teams);
 					if(team == null) {
-						p.sendMessage("Leider gibt es das angegebende Team(" + teams + ") nicht auf dieser Welt.");
+						p.sendMessage("§eLeider gibt es das angegebende Team(§e" + teams + "§e) nicht auf dieser Welt.");
 						return true;
 					}
 					
@@ -179,7 +179,7 @@ public class Command_Setup implements CommandExecutor{
 					Block standingBlock = p.getLocation().getBlock().getRelative(BlockFace.DOWN);
 					
 					if(targetBlock == null || standingBlock == null) {
-						p.sendMessage("Es gab ein Fehler beim speichern des Betts. Bitte gucke ob du genau über dem Bett bist und den vodere Teil anvisierst.");
+						p.sendMessage("§eEs gab ein Fehler beim speichern des Betts. Bitte gucke ob du genau über dem Bett bist und den vodere Teil anvisierst.");
 						return true;
 					}
 					
@@ -209,10 +209,10 @@ public class Command_Setup implements CommandExecutor{
 					currentMap.addTeam(team);
 					
 					Main.game.addMap(currentMap);
-					p.sendMessage("Du hast erolgreich das Bett für Team(" + team.getTeamenum().getPrefix() + "§r) erstellt.");
+					p.sendMessage("§eDu hast erolgreich das Bett für Team(§e" + team.getTeamenum().getPrefix() + "§e) erstellt.");
 					return true;
 				}else{
-					p.sendMessage("Du musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
+					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
 					return true;
 				}
 			}else{
