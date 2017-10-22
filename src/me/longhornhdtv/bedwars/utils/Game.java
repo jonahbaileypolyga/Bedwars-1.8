@@ -94,20 +94,20 @@ public class Game {
 					map2.addSpawner(spawner);
 				}
 				if(map2.getAllSpawnerfromtheMap() == null) {
-					Bukkit.broadcastMessage(Main.getPrefix() + "§4Map konnte nicht hinzugefüt werden, weil kein Spawner gesetzt wurde.");
+					Bukkit.broadcastMessage(Main.getPrefix() + "§cMap konnte nicht hinzugefüt werden, weil kein Spawner gesetzt wurde.");
 					return;
 				}
 				if(!(map.getVoteItem() == null)) {
 					map2.addVoteItem(map.getVoteItem());
 				}else{
-					Bukkit.broadcastMessage(Main.getPrefix() + "§4Map konnte nicht hinzugefüt werden, weil kein VoteItem gesetzt wurde.");
+					Bukkit.broadcastMessage(Main.getPrefix() + "§cMap konnte nicht hinzugefüt werden, weil kein VoteItem gesetzt wurde.");
 					return;
 				}
 				maps.add(map2);
 				Bukkit.broadcastMessage(Main.getPrefix() + "§aMap wurde erfolgreich hinzugefügt.");
 				return;
 			}else{
-				Bukkit.broadcastMessage(Main.getPrefix() + "§4Map konnte nicht hinzugefügt werden.");
+				Bukkit.broadcastMessage(Main.getPrefix() + "§cMap konnte nicht hinzugefügt werden.");
 				return;
 			}
 		}
