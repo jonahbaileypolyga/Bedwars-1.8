@@ -1,6 +1,5 @@
 package me.longhornhdtv.bedwars.utils;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,22 +16,26 @@ public class Map {
 	private String realMapName;
 	private HashMap<Location, Block> changesBlock = new HashMap<>();
 	
-	public Map(String mapName) {
-		this.mapName = mapName;
-	}
+//	public Map(String mapName) {
+//		this.mapName = mapName;
+//	}
 	
 	public Map(String mapName, String realMapName) {
 		this.mapName = mapName;
 		this.realMapName = realMapName;
 	}
 	
+	public void setRealMapName(String mapRealName) {
+		this.realMapName = mapRealName;
+	}
+	
 	public void setMapname(String mapName) {
 		this.mapName = mapName;
 	}
 	
-	public void setFolderMap(String realMapName) {
-		this.realMapName = realMapName;
-	}
+//	public void setFolderMap(String realMapName) {
+//		this.realMapName = realMapName;
+//	}
 	
 	public String getRealMapName() {
 		return this.realMapName;
@@ -63,6 +66,10 @@ public class Map {
 		if(spawners.contains(spawner)) {
 			spawners.remove(spawner);
 		}
+	}
+	
+	public void removeAllSpawner() {
+		spawners.clear();
 	}
 	
 	public Team getTeam(Teams team) {

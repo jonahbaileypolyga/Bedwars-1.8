@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.longhornhdtv.bedwars.main.Main;
@@ -101,8 +102,8 @@ public class Game {
 	
 	public void addMap(Map map) {
 		if(!maps.contains(map) || maps.isEmpty()) {
-			if(Bukkit.getWorld(map.getMapName()) != null) {
-				Map map2 = new Map(Bukkit.getWorld(map.getMapName()).getName());
+			if(Bukkit.getWorld(map.getRealMapName()) != null) {
+				Map map2 = new Map(map.getMapName(), Bukkit.getWorld(map.getRealMapName()).getName());
 //				for(Spawner spawner : map.getAllSpawnerfromtheMap()) {
 //					map2.addSpawner(spawner);
 //				}
@@ -152,9 +153,9 @@ public class Game {
 		}
 	}
 	
-	public void shutdownServer() {
+	public void shutdownServer(Player p) {
 		YamlConfiguration cfg = YamlConfiguration.loadConfiguration(this.file);
-		if(checkIsGameReady()) {
+		if(checkIsGameReady(p)) {
 			if(!this.file.exists()) {
 				try {
 					file.createNewFile();
@@ -165,7 +166,9 @@ public class Game {
 			cfg.set("Game.Name", this.name);
 			cfg.set("Game.MaxPlayers", this.maxPlayers);
 		}else{
-			this.file.delete();
+			if(this.file.exists() && !isGameReady && !isBuildMode) {
+				this.file.delete();
+			}
 		}
 	}
 	
@@ -207,7 +210,139 @@ public class Game {
 		return this.name;
 	}
 	
-	private boolean checkIsGameReady() {
+	private boolean checkIsGameReady(Player p) {
+		if(this.maps.size() > 0) {
+			//Maps Check
+			boolean check = true;
+			ArrayList<Map> breakMaps = new ArrayList<>();
+			for(Map map : this.maps) {
+				if(Bukkit.getWorld(map.getRealMapName()) == null) {
+					p.sendMessage("Für die Map(" + map.getMapName() + ") wurde keine Karte gefunden. Und wird entfernt.");
+					check = false;
+					continue;
+				}
+				if(map.getAllSpawnerfromtheMap().size() == 0) {
+					p.sendMessage("Die Map(" + map.getMapName() + ") hat keine Spawner.");
+					if(!breakMaps.contains(map)) {
+						breakMaps.add(map);
+					}
+					check = false;
+					continue;
+				}
+				if(map.getTeams().size() == 0) {
+					p.sendMessage("Die Map(" + map.getMapName() + ") hat keine Teams.");
+					if(!breakMaps.contains(map)) {
+						breakMaps.add(map);
+					}
+					check = false;
+					continue;
+				}
+			}
+			
+			if(check == false) {
+				p.sendMessage("Du musst bei den Maps die unter dieser Nachricht aufgelistet werden überprüfen ob dort auch wirklich Spawner und Teams gesetzt wurden.");
+				String message = "";
+				for(Map map : breakMaps) {
+					message = message + map.getMapName() + ", ";
+				}
+				message = message.substring(0, message.length() - 2);
+				p.sendMessage(message);
+				p.sendMessage("Du kannst dich mit /bw tp (MapName) zu der Map teleportieren.");
+				return false;
+			}
+			
+			//Maps Check End
+			//Team Check
+			ArrayList<Map> breakMaps2 = new ArrayList<>();
+			for(Map map : this.maps) {
+				for(Team team : map.getTeams()) {
+					if(team.getSpawn() == null) {
+						p.sendMessage("Das Team(" + team.getTeamenum().getPrefix() + ") hat kein Spawn. Team wurde entfernt.");
+						check = false;
+						breakMaps2.add(map);
+						continue;
+					}
+					if(team.getBedBack() == null || team.getBedHead() == null) {
+						p.sendMessage("Das Team(" + team.getTeamenum().getPrefix() + ") hat kein Bed. Team wurde entfernt.");
+						check = false;
+						breakMaps2.add(map);
+						continue;
+					}
+				}
+			}
+			
+			if(check == false) {
+				p.sendMessage("Die Maps die unter dieser Nachricht aufgelistet werden habe ein oder mehere defekte Teams. Bitte setzte sie noch mal.");
+				String message = "";
+				for(Map map : breakMaps2) {
+					message = message + map.getMapName() + ", ";
+				}
+				message = message.substring(0, message.length() - 2);
+				p.sendMessage(message);
+				return false;
+			}
+			
+			//Team Check End
+			//Spawner Check
+			
+			ArrayList<Spawner> newSet = new ArrayList<>();
+			ArrayList<Map> newMaps = new ArrayList<>();
+			ArrayList<Map> tmp = this.maps;
+			for(Map map : tmp) {
+				boolean b = false;
+				for(Spawner spawner : map.getAllSpawnerfromtheMap()) {
+					if(spawner.getItem() == null) {
+						
+						Spawner nnew = new Spawner(spawner.getSpawnerEnum(), spawner.getLoc());
+						
+						nnew.setItem(new ItemStack(spawner.getSpawnerEnum().getMaterial()));
+						newSet.add(nnew);
+						if(!newMaps.contains(map)) {
+							newMaps.add(map);
+						}
+						if(this.maps.contains(spawner)) {
+							this.maps.remove(spawner);
+						}
+						b = true;
+					}
+					
+					if(spawner.getSpawnerID() == "" || spawner.getSpawnerID() == null) {
+						Spawner nnew = new Spawner(spawner.getSpawnerEnum(), spawner.getLoc());
+						
+						nnew.generateSpawnerID();
+						newSet.add(nnew);
+						if(!newMaps.contains(map)) {
+							newMaps.add(map);
+						}
+						if(this.maps.contains(spawner)) {
+							this.maps.remove(spawner);
+						}
+						b = true;
+					}
+					if(b) {
+						newSet.add(spawner);
+						if(!newMaps.contains(map)) {
+							newMaps.add(map);
+						}
+						if(this.maps.contains(spawner)) {
+							this.maps.remove(spawner);
+						}
+					}
+				}
+			}
+			
+			for(Map map : newMaps) {
+				map.removeAllSpawner();
+				for(Spawner spawner : newSet) {
+					map.addSpawner(spawner);
+				}
+				this.maps.add(map);
+			}
+		}else{
+			p.sendMessage("Du musst erst eine Map hinzufügen.");
+			return false;
+		}
+		
 		//TODO: Wenn alles Fertig ist mach den Programmiere den Check.
 		return true;
 	}
