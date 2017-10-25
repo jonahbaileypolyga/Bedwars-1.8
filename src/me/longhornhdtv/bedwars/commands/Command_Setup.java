@@ -17,6 +17,8 @@ import org.bukkit.material.Bed;
 
 import me.longhornhdtv.bedwars.main.Main;
 import me.longhornhdtv.bedwars.utils.Map;
+import me.longhornhdtv.bedwars.utils.Spawner;
+import me.longhornhdtv.bedwars.utils.SpawnerEnum;
 import me.longhornhdtv.bedwars.utils.Team;
 import me.longhornhdtv.bedwars.utils.Teams;
 
@@ -32,6 +34,7 @@ public class Command_Setup implements CommandExecutor{
 	//setup setLobby
 	//setup addMap (Name) (VoteItemID:[MetaID])  - Permission: bw.addMap
 	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels) - Permission: bw.create
+	//setup addTeam (TeamEnum) (maxmale Spieler für das Team) - Permission: bw.addTeam
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String lebel, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -54,16 +57,21 @@ public class Command_Setup implements CommandExecutor{
 			p.sendMessage("§e/setup setlobby setze den Lobby Spawn.");
 			p.sendMessage("§e/setup setSpawnPosition [TeamFarbe  Schwartz,Weiß,Rot,Gelb,Grün,Lila,Orange,Blau] um den Teamspawn zu setzen.");
 			p.sendMessage("§e/setup setBed [TeamFarbe] um das Bett zu setzen.");
-			p.sendMessage("§e/setup setspawner [Bronze,Silver,Gold] um die Spawner zu setzen.");
+			p.sendMessage("§e/setup setSpawner [Bronze,Silver,Gold] um die Spawner zu setzen.");
 			p.sendMessage("");
 			p.sendMessage("§e-------Setup-End-------");
 			return true;
 		}else
 		if(args.length == 1) {
 			if(args[0].equalsIgnoreCase("setLobby")) {
-				Main.game.lobbyLocation = p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D);
-				p.sendMessage("Du hast erfolgreich die Lobby gesetzt.");
-				return true;
+				if(p.getLocation().getBlock().getType() == Material.AIR){
+					Main.game.lobbyLocation = p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D);
+					p.sendMessage("Du hast erfolgreich die Lobby gesetzt.");
+					return true;
+				}else{
+					p.sendMessage("Du kannst die Lobby nicht in der Luft setzten.");
+					return true;
+				}
 			}else{
 				
 				return true;
@@ -71,14 +79,207 @@ public class Command_Setup implements CommandExecutor{
 		}else
 		if(args.length == 2){
 			if(args[0].equalsIgnoreCase("setSpawner")) {
+				if(currentMap != null) {
+					SpawnerEnum se = null;
+					for(SpawnerEnum sea : SpawnerEnum.values()) {
+						if(sea.name().equalsIgnoreCase(args[1])) {
+							se = sea;
+						}
+					}
+					if(se == null) {
+						p.sendMessage("Leider gibt es kein Spawner mit dem Name(" + args[1] + ").");
+						return true;
+					}
+					Spawner s = new Spawner(se, p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D));
+					s.setItem(new ItemStack(se.getMaterial()));
+					s.generateSpawnerID();
+					
+					Main.game.removeMap(currentMap);
+					
+					currentMap.addSpawner(s);
+					
+					Main.game.addMap(currentMap);
 				
+					p.sendMessage("Du hast erfolgreich den Spawner(" + args[1].toUpperCase() + ") hinzugefügt.");
+					return true;
+				}else{
+					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
+					return true;
+				}
+			}else
+			if(args[0].equalsIgnoreCase("setSpawnPosition")) {
+				if(currentMap == null) {
+					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
+					return true;
+				}
+				Teams teams = null;
+				for(Teams tenum : Teams.values()) {
+					if(tenum.name().equalsIgnoreCase(args[1].toUpperCase())) {
+						teams = tenum;
+					}
+				}
+				
+				if(teams == null) {
+					p.sendMessage("§eDu musst ein Name von den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen.");
+					return true;
+				}
+				
+				Team team = currentMap.getTeam(teams);
+				if(team == null) {
+					p.sendMessage("Du musst zuerst das Team(" + teams.getPrefix() + ") erstellen.");
+					return true;
+				}
+				
+				team.setSpawn(p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D));
+				
+				Main.game.removeMap(currentMap);
+				
+				currentMap.addTeam(team);
+					
+				Main.game.addMap(currentMap);
+				p.sendMessage("§eDu hast erolgreich den Team-Spawn für Team(§e" + team.getTeamenum().getPrefix() + "§e) erstellt.");
 				return true;
+			}else
+			if(args[0].equalsIgnoreCase("setBed")) {
+				if(currentMap != null) {
+					Teams teams = null;
+					for(Teams tenum : Teams.values()) {
+						if(tenum.name().equalsIgnoreCase(args[1].toUpperCase())) {
+							teams = tenum;
+						}
+					}
+					if(teams == null) {
+						p.sendMessage("§eDu musst ein Name von den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen. Benutze /setup addTeam (Team) (Maximale Spieler Anzahl) um eins zu erstellen.");
+						return true;
+					}
+					Team team = currentMap.getTeam(teams);
+					if(team == null) {
+						p.sendMessage("§eLeider gibt es das angegebende Team(§e" + teams + "§e) nicht auf dieser Welt. Benutze /setup addTeam (Team) (Maximale Spieler Anzahl) um eins zu erstellen.");
+						return true;
+					}
+					
+					currentMap.removeTeam(team);
+						
+						//CODE from BedwarsRel
+					HashSet<Material> transparent = new HashSet<Material>();
+					transparent.add(Material.AIR);
+					
+					Class<?> hashsetType = getGenericTypeOfParameters(p.getClass(), "getTargetBlock", 0);
+					Method targetBlockMethod = null;
+					Block targetBlock = null;
+					
+					try {
+						try {
+							targetBlockMethod = p.getClass().getMethod("getTargetBlock", new Class<?>[]{Set.class, int.class});
+						} catch (Exception ex) {
+							try {
+								targetBlockMethod = p.getClass().getMethod("getTargetBlock", new Class<?>[]{HashSet.class, int.class});
+							} catch (Exception exc) {
+								exc.printStackTrace();
+							}
+						}
+							
+						if(hashsetType.equals(Byte.class)) {
+							targetBlock = (Block) targetBlockMethod.invoke(p, new Object[]{null, 15});
+						}else{
+							targetBlock = (Block) targetBlockMethod.invoke(p, new Object[]{transparent, 15});
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+						
+					Block standingBlock = p.getLocation().getBlock().getRelative(BlockFace.DOWN);
+					
+					if(targetBlock == null || standingBlock == null) {
+						p.sendMessage("§eEs gab ein Fehler beim speichern des Betts. Bitte gucke ob du genau über dem Bett bist und den vodere Teil anvisierst.");
+						return true;
+					}
+						
+					
+					Material targetMaterial = Material.BED_BLOCK;
+						
+					Block theBlock = null;
+					if(targetBlock.getType() == targetMaterial) {
+						theBlock = targetBlock;
+					}else{
+						theBlock = standingBlock;
+					}
+					
+					Block neightbor = null;
+					Bed theBed = (Bed) theBlock.getState().getData();
+					
+					if(!theBed.isHeadOfBed()) {
+						neightbor = theBlock;
+						theBlock = getBedNeightbor(neightbor);
+					}else{
+						neightbor = getBedNeightbor(theBlock);
+					}
+					
+					team.setBed(neightbor, theBlock);
+						
+					Main.game.removeMap(currentMap);
+						
+					currentMap.addTeam(team);
+						
+					Main.game.addMap(currentMap);
+					p.sendMessage("§eDu hast erolgreich das Bett für Team(§e" + team.getTeamenum().getPrefix() + "§e) erstellt.");
+					return true;
+				}else{
+					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
+					return true;
+				}
 			}else{
 				
 				return true;
 			}
 		}else
 		if(args.length == 3) {
+			if(args[0].equalsIgnoreCase("addTeam")) {
+				if(currentMap == null) {
+					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
+					return true;
+				}
+				if(!p.hasPermission("bw.addTeam")) {
+					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
+					return true;
+				}
+				Teams teams = null;
+				for(Teams tenum : Teams.values()) {
+					if(tenum.name().equalsIgnoreCase(args[1].toUpperCase())) {
+						teams = tenum;
+					}
+				}
+				
+				if(teams == null) {
+					p.sendMessage("§eDu musst ein Name von den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen.");
+					return true;
+				}
+				
+				Team team = currentMap.getTeam(teams);
+				if(team == null) {
+					int maxPlayers = 0;
+					try {
+						maxPlayers = Integer.parseInt(args[2]);
+					} catch(Exception e) {
+						p.sendMessage("Du musst eine Zahl eingeben bei Maximaler Spielranzahl für das Spiel.");
+						return true;
+					}
+					
+					if(maxPlayers == 0) {
+						p.sendMessage("Du kannst dem Team nicht die Maximale Spieleranzahl auf 0 stellen.");
+						return true;
+					}
+					Main.game.removeMap(currentMap);
+					currentMap.addTeam(new Team(teams, maxPlayers));
+					Main.game.addMap(currentMap);
+					p.sendMessage("Das Team(" + teams.getPrefix() + ") wurde erfolgreich hinzugefügt.");
+					return true;
+				}else{
+					p.sendMessage("Das Team(" + team.getTeamenum().getPrefix() + ") ist schon vorhanden auf dieser Map.");
+					return true;
+				}
+				
+			}else
 			if(args[0].equalsIgnoreCase("addMap")) {
 				if(!p.hasPermission("bw.addMap")) {
 					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
@@ -162,98 +363,6 @@ public class Command_Setup implements CommandExecutor{
 					}
 				}else{
 					p.sendMessage("§eDu hast auf diesem Server schon ein Spiel erstellt. Bitte erstelle Maps.");
-					return true;
-				}
-			}else
-			if(args[0].equalsIgnoreCase("setSpawnPosition")) {
-				
-				return true;
-			}else
-			if(args[0].equalsIgnoreCase("setBed")) {
-				if(currentMap != null) {
-					Teams teams = null;
-					for(Teams tenum : Teams.values()) {
-						if(tenum.name().equalsIgnoreCase(args[1].toUpperCase())) {
-							teams = tenum;
-						}
-					}
-					if(teams == null) {
-						p.sendMessage("§eDu musst ein Name vo den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen. ");
-						return true;
-					}
-					Team team = currentMap.getTeam(teams);
-					if(team == null) {
-						p.sendMessage("§eLeider gibt es das angegebende Team(§e" + teams + "§e) nicht auf dieser Welt.");
-						return true;
-					}
-					
-					currentMap.removeTeam(team);
-					
-					//CODE from BedwarsRel
-					HashSet<Material> transparent = new HashSet<Material>();
-					transparent.add(Material.AIR);
-					
-					Class<?> hashsetType = getGenericTypeOfParameters(p.getClass(), "getTargetBlock", 0);
-					Method targetBlockMethod = null;
-					Block targetBlock = null;
-					
-					try {
-						try {
-							targetBlockMethod = p.getClass().getMethod("getTargetBlock", new Class<?>[]{Set.class, int.class});
-						} catch (Exception ex) {
-							try {
-								targetBlockMethod = p.getClass().getMethod("getTargetBlock", new Class<?>[]{HashSet.class, int.class});
-							} catch (Exception exc) {
-								exc.printStackTrace();
-							}
-						}
-						
-						if(hashsetType.equals(Byte.class)) {
-							targetBlock = (Block) targetBlockMethod.invoke(p, new Object[]{null, 15});
-						}else{
-							targetBlock = (Block) targetBlockMethod.invoke(p, new Object[]{transparent, 15});
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					
-					Block standingBlock = p.getLocation().getBlock().getRelative(BlockFace.DOWN);
-					
-					if(targetBlock == null || standingBlock == null) {
-						p.sendMessage("§eEs gab ein Fehler beim speichern des Betts. Bitte gucke ob du genau über dem Bett bist und den vodere Teil anvisierst.");
-						return true;
-					}
-					
-					Material targetMaterial = Material.BED_BLOCK;
-					
-					Block theBlock = null;
-					if(targetBlock.getType() == targetMaterial) {
-						theBlock = targetBlock;
-					}else{
-						theBlock = standingBlock;
-					}
-					
-					Block neightbor = null;
-					Bed theBed = (Bed) theBlock.getState().getData();
-					
-					if(!theBed.isHeadOfBed()) {
-						neightbor = theBlock;
-						theBlock = getBedNeightbor(neightbor);
-					}else{
-						neightbor = getBedNeightbor(theBlock);
-					}
-					
-					team.setBed(neightbor, theBlock);
-					
-					Main.game.removeMap(currentMap);
-					
-					currentMap.addTeam(team);
-					
-					Main.game.addMap(currentMap);
-					p.sendMessage("§eDu hast erolgreich das Bett für Team(§e" + team.getTeamenum().getPrefix() + "§e) erstellt.");
-					return true;
-				}else{
-					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
 					return true;
 				}
 			}else{

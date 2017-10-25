@@ -68,8 +68,12 @@ public class Game {
 						continue;
 					}
 				}
+				boolean b2 = true;
+				if(this.maps.size() < 3) {
+					b2 = false;
+				}
 				
-				while(this.maps.size() > 3) {
+				while(this.maps.size() > 3 & b2) {
 					Random rnd = new Random();
 					Map removeMap = this.maps.get(rnd.nextInt(this.maps.size()));
 					Main.unloadWold(removeMap.getRealMapName());
@@ -154,15 +158,16 @@ public class Game {
 	}
 	
 	public void shutdownServer(Player p) {
-		YamlConfiguration cfg = YamlConfiguration.loadConfiguration(this.file);
+		
 		if(checkIsGameReady(p)) {
 			if(!this.file.exists()) {
 				try {
-					file.createNewFile();
+					this.file.createNewFile();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
+			YamlConfiguration cfg = YamlConfiguration.loadConfiguration(this.file);
 			cfg.set("Game.Name", this.name);
 			cfg.set("Game.MaxPlayers", this.maxPlayers);
 		}else{
@@ -338,12 +343,28 @@ public class Game {
 				}
 				this.maps.add(map);
 			}
+			
+			if(this.name == "" || this.name == null) {
+				p.sendMessage("Du musst zuerst ein Spiel erstellen. Oder es neu erstellen.");
+				return false;
+			}
+			
+		if(this.maxPlayers == 0) {
+			p.sendMessage("Du hast keine Maximale Spieleranzahl eingegen. Bitte erstelle das Spiel neu.");
+			return false;
+		}
+		
+		if(this.lobbyLocation == null) {
+			p.sendMessage("Du hast kein Lobby-Spawn gesetzt.");
+			return false;
+		}
+		
+		return true;
 		}else{
 			p.sendMessage("§eDu musst erst eine Map hinzufügen.");
 			return false;
 		}
-		
-		//TODO: Wenn alles Fertig ist mach den Programmiere den Check.
-		return true;
+//		//TODO: Wenn alles Fertig ist mach den Programmiere den Check.
+//		return true;
 	}
 }
