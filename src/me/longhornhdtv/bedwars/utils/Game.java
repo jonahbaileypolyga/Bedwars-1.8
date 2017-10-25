@@ -114,14 +114,14 @@ public class Game {
 				if(!(map.getVoteItem() == null)) {
 					map2.addVoteItem(map.getVoteItem());
 				}else{
-					Bukkit.broadcastMessage(Main.getPrefix() + "§cMap konnte nicht hinzugefüt werden, weil kein VoteItem gesetzt wurde.");
+					Bukkit.broadcastMessage(Main.getPrefix() + "§eMap konnte nicht hinzugefüt werden, weil kein VoteItem gesetzt wurde.");
 					return;
 				}
 				maps.add(map2);
 				Bukkit.broadcastMessage(Main.getPrefix() + "§aMap wurde erfolgreich hinzugefügt.");
 				return;
 			}else{
-				Bukkit.broadcastMessage(Main.getPrefix() + "§cMap konnte nicht hinzugefügt werden.");
+				Bukkit.broadcastMessage(Main.getPrefix() + "§eMap konnte nicht hinzugefügt werden.");
 				return;
 			}
 		}
@@ -217,12 +217,12 @@ public class Game {
 			ArrayList<Map> breakMaps = new ArrayList<>();
 			for(Map map : this.maps) {
 				if(Bukkit.getWorld(map.getRealMapName()) == null) {
-					p.sendMessage("Für die Map(" + map.getMapName() + ") wurde keine Karte gefunden. Und wird entfernt.");
+					p.sendMessage("§eFür die Map(" + map.getMapName() + ") wurde keine Karte gefunden. Und wird entfernt.");
 					check = false;
 					continue;
 				}
 				if(map.getAllSpawnerfromtheMap().size() == 0) {
-					p.sendMessage("Die Map(" + map.getMapName() + ") hat keine Spawner.");
+					p.sendMessage("§eDie Map(" + map.getMapName() + ") hat keine Spawner.");
 					if(!breakMaps.contains(map)) {
 						breakMaps.add(map);
 					}
@@ -230,7 +230,7 @@ public class Game {
 					continue;
 				}
 				if(map.getTeams().size() == 0) {
-					p.sendMessage("Die Map(" + map.getMapName() + ") hat keine Teams.");
+					p.sendMessage("§eDie Map(" + map.getMapName() + ") hat keine Teams.");
 					if(!breakMaps.contains(map)) {
 						breakMaps.add(map);
 					}
@@ -240,14 +240,14 @@ public class Game {
 			}
 			
 			if(check == false) {
-				p.sendMessage("Du musst bei den Maps die unter dieser Nachricht aufgelistet werden überprüfen ob dort auch wirklich Spawner und Teams gesetzt wurden.");
+				p.sendMessage("§eDu musst bei den Maps die unter dieser Nachricht aufgelistet werden überprüfen ob dort auch wirklich Spawner und Teams gesetzt wurden.");
 				String message = "";
 				for(Map map : breakMaps) {
 					message = message + map.getMapName() + ", ";
 				}
 				message = message.substring(0, message.length() - 2);
 				p.sendMessage(message);
-				p.sendMessage("Du kannst dich mit /bw tp (MapName) zu der Map teleportieren.");
+				p.sendMessage("§eDu kannst dich mit /bw tp (MapName) zu der Map teleportieren.");
 				return false;
 			}
 			
@@ -257,13 +257,13 @@ public class Game {
 			for(Map map : this.maps) {
 				for(Team team : map.getTeams()) {
 					if(team.getSpawn() == null) {
-						p.sendMessage("Das Team(" + team.getTeamenum().getPrefix() + ") hat kein Spawn. Team wurde entfernt.");
+						p.sendMessage("§eDas Team(" + team.getTeamenum().getPrefix() + ") hat kein Spawn. Team wurde entfernt.");
 						check = false;
 						breakMaps2.add(map);
 						continue;
 					}
 					if(team.getBedBack() == null || team.getBedHead() == null) {
-						p.sendMessage("Das Team(" + team.getTeamenum().getPrefix() + ") hat kein Bed. Team wurde entfernt.");
+						p.sendMessage("§eDas Team(" + team.getTeamenum().getPrefix() + ") hat kein Bed. Team wurde entfernt.");
 						check = false;
 						breakMaps2.add(map);
 						continue;
@@ -272,7 +272,7 @@ public class Game {
 			}
 			
 			if(check == false) {
-				p.sendMessage("Die Maps die unter dieser Nachricht aufgelistet werden habe ein oder mehere defekte Teams. Bitte setzte sie noch mal.");
+				p.sendMessage("§eDie Maps die unter dieser Nachricht aufgelistet werden habe ein oder mehere defekte Teams. Bitte setzte sie noch mal.");
 				String message = "";
 				for(Map map : breakMaps2) {
 					message = message + map.getMapName() + ", ";
@@ -339,7 +339,7 @@ public class Game {
 				this.maps.add(map);
 			}
 		}else{
-			p.sendMessage("Du musst erst eine Map hinzufügen.");
+			p.sendMessage("§eDu musst erst eine Map hinzufügen.");
 			return false;
 		}
 		
