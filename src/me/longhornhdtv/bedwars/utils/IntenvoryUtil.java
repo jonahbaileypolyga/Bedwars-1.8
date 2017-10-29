@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -18,11 +19,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class IntenvoryUtil implements Listener{
 
-	public static HashMap<Integer, Material> bloecke_mat = new HashMap<Integer, Material>();
+	public static HashMap<Integer, Material> bloecke_mat = new HashMap<>();
 	public static HashMap<Integer, Integer> bloecke_price = new HashMap<>();
+	public static HashMap<Integer, Material> ruestung_mat = new HashMap<>();
+	public static HashMap<Integer, Integer> ruestung_price = new HashMap<>();
 	
 	
 	//Inventories
@@ -42,8 +46,36 @@ public class IntenvoryUtil implements Listener{
 		inv.setItem(11, createItemal(Material.SANDSTONE, "§cSandstein", 2, Arrays.asList("§7§l1 Bronze")));
 		inv.setItem(12, createItemal(Material.ENDER_STONE, "§cEndstein", 1, Arrays.asList("§7§l7 Bronze")));
 		inv.setItem(13, createItemal(Material.IRON_BLOCK, "§cEisenblock", 1, Arrays.asList("§7§l3 Eisen")));
-		inv.setItem(14, createItem(Material.BARRIER, "§4§8Nicht Verfügbar"));
+		inv.setItem(14, createItem(Material.BARRIER, "§8§lNicht Verfügbar"));
 		inv.setItem(15, createItemal(Material.GLOWSTONE, "§cGlowstone", 1, Arrays.asList("§7§l4 Bronze")));
+	
+		p.openInventory(inv);
+	}
+	
+	public void openRuestungInv(Player p) {
+		Inventory inv = Bukkit.createInventory(null, 9*2, "§8➤ §c§lShop §8- §c§lRüstung");
+		HashMap<Enchantment, Integer> list = new HashMap<>();
+		list.put(Enchantment.SILK_TOUCH, 1);
+		inv.setItem(0, createItem(Material.SANDSTONE, "§8➤ §7Blöcke"));
+		inv.setItem(1, createItemenchant(Material.CHAINMAIL_CHESTPLATE, "§8➤ §7Rüstung", "", list));
+		inv.setItem(2, createItem(Material.IRON_PICKAXE, "§8➤ §7Spitzhacken"));
+		inv.setItem(3, createItem(Material.WOOD_SWORD, "§8➤ §7Schwerter"));
+		inv.setItem(4, createItem(Material.BOW, "§8➤ §7Bögen"));
+		inv.setItem(5, createItem(Material.CAKE, "§8➤ §7Essen"));
+		inv.setItem(6, createItem(Material.ENDER_CHEST, "§8➤ §7Kisten"));
+		inv.setItem(7, createItem(Material.GLASS_BOTTLE, "§8➤ §7Tränke"));
+		inv.setItem(8, createItem(Material.EMERALD, "§8➤ §7Spezial"));
+		inv.setItem(9, createItemarmor("§cLederhelm", "§7§l1 Bronze", Material.LEATHER_HELMET, p));
+		inv.setItem(10, createItemarmor("§cLederhose", "§7§l1 Bronze", Material.LEATHER_LEGGINGS, p));
+		inv.setItem(11, createItemarmor("§cLederschuhe", "§7§l1 Bronze", Material.LEATHER_BOOTS, p));
+		inv.setItem(14, createItemal(Material.CHAINMAIL_CHESTPLATE, "§cBrustplatte Level 1", 1, Arrays.asList("§7§l1 Eisen")));
+		list.put(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
+		inv.setItem(15, createItemenchant(Material.CHAINMAIL_CHESTPLATE, "§cBrustplatte Level 2", "§7§l3 Eisen", list));
+		list.put(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+		inv.setItem(16, createItemenchant(Material.CHAINMAIL_CHESTPLATE, "§cBrustplatte Level 3", "§7§l5 Eisen", list));
+		list.put(Enchantment.PROTECTION_ENVIRONMENTAL, 2);
+		list.put(Enchantment.THORNS, 1);
+		inv.setItem(17, createItemenchant(Material.CHAINMAIL_CHESTPLATE, "§cBrustplatte Level 4", "§7§l7 Eisen", list));
 	
 		p.openInventory(inv);
 	}
@@ -60,7 +92,7 @@ public class IntenvoryUtil implements Listener{
         inv.addItem(createItem(Material.ENDER_CHEST, "§8➤ §7Kisten"));
         inv.addItem(createItem(Material.GLASS_BOTTLE, "§8➤ §7Tränke"));
         inv.addItem(createItem(Material.EMERALD, "§8➤ §7Spezial"));
-
+        
         p.openInventory(inv);
 	}
 	
@@ -94,8 +126,18 @@ public class IntenvoryUtil implements Listener{
         return item;
     }
 	
+	public static ItemStack createItemarmor(String name, String lore, Material m, Player p) {
+		ItemStack item = new ItemStack(m);
+		LeatherArmorMeta itemmeta = (LeatherArmorMeta) item.getItemMeta();
+		itemmeta.setDisplayName(name);
+		itemmeta.setLore(Arrays.asList(lore));
+		itemmeta.setColor(Color.PURPLE);
+		item.setItemMeta(itemmeta);
+		return item;
+	}
 	
-	public static void removeInventoryItemsStack(PlayerInventory inv, Material type, int amount, ItemStack add) {
+	
+	public static boolean removeInventoryItemsStack(PlayerInventory inv, Material type, int amount, ItemStack add) {
         int maxamount = 0;
         ItemStack[] arritemStack = inv.getContents();
         int n = arritemStack.length;
@@ -108,7 +150,7 @@ public class IntenvoryUtil implements Listener{
             ++n2;
         }
         if(maxamount < amount) {
-        	return;
+        	return false;
         }
         int amountofitems = maxamount / amount;
         if (add.getAmount() == 2) {
@@ -125,6 +167,7 @@ public class IntenvoryUtil implements Listener{
             inv.addItem(new ItemStack[]{add});
             ++i;
         }
+        return true;
     }
     public static boolean removeInventoryItems(PlayerInventory inv, Material type, int amount) {
         boolean b = false;
@@ -174,6 +217,10 @@ public class IntenvoryUtil implements Listener{
 					if(s.equalsIgnoreCase("§8➤ §7Blöcke")) {
 						openBloeckeInv(p);
 						p.updateInventory();
+					}else
+					if(s.equalsIgnoreCase("§8➤ §7Rüstung")) {
+						openRuestungInv(p);
+						p.updateInventory();
 					}
 				}
 			}
@@ -195,6 +242,10 @@ public class IntenvoryUtil implements Listener{
 					if(e.getInventory().getName().contains("Blöcke")) {
 						list1 = bloecke_mat;
 						list2 = bloecke_price;
+					}
+					if(e.getInventory().getName().contains("Rüstung")) {
+						list1 = ruestung_mat;
+						list2 = ruestung_price;
 					}
 					
 					if(list1 != null && list2 != null && s.contains("§c")) {
@@ -222,18 +273,44 @@ public class IntenvoryUtil implements Listener{
 							Material m = e.getCurrentItem().getType();
 							short nebenID = e.getCurrentItem().getData().getData();
 							
-							p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1);
 							
 							ItemStack add = new ItemStack(m, amount, nebenID);
-							ItemMeta itemmeta = add.getItemMeta();
-							Map<Enchantment, Integer> enchanments = e.getCurrentItem().getItemMeta().getEnchants();
-							
-							for(Enchantment ench : enchanments.keySet()) {
-								itemmeta.addEnchant(ench, enchanments.get(ench), true);
+							if(e.getCurrentItem().getType() == Material.LEATHER_HELMET || e.getCurrentItem().getType() == Material.LEATHER_CHESTPLATE
+                                    || e.getCurrentItem().getType() == Material.LEATHER_LEGGINGS || e.getCurrentItem().getType() == Material.LEATHER_BOOTS) {
+								LeatherArmorMeta itemmeta = (LeatherArmorMeta) add.getItemMeta();
+								LeatherArmorMeta im2 = (LeatherArmorMeta) e.getCurrentItem().getItemMeta();
+								
+								itemmeta.setColor(im2.getColor());
+								
+								Map<Enchantment, Integer> enchanments = e.getCurrentItem().getItemMeta().getEnchants();
+								
+								for(Enchantment ench : enchanments.keySet()) {
+									itemmeta.addEnchant(ench, enchanments.get(ench), true);
+								}
+								add.setItemMeta(itemmeta);
+								
+								if(removeInventoryItemsStack(p.getInventory(), waehrung, price, add)) {
+									p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1);
+								}else{
+									p.sendMessage("§cDu hast zu wenig Ressourcen!");
+//									openMainInv(p);
+								}
+							}else{
+								ItemMeta itemmeta = add.getItemMeta();
+								Map<Enchantment, Integer> enchanments = e.getCurrentItem().getItemMeta().getEnchants();
+								
+								for(Enchantment ench : enchanments.keySet()) {
+									itemmeta.addEnchant(ench, enchanments.get(ench), true);
+								}
+								add.setItemMeta(itemmeta);
+								
+								if(removeInventoryItemsStack(p.getInventory(), waehrung, price, add)) {
+									p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1, 1);
+								}else{
+									p.sendMessage("§cDu hast zu wenig Ressourcen!");
+//	                            	openMainInv(p);
+								}
 							}
-							add.setItemMeta(itemmeta);
-							
-							removeInventoryItemsStack(p.getInventory(), waehrung, price, add);
 						}else{
 							int price = 0;
                             Material waehrung = null;
@@ -263,19 +340,37 @@ public class IntenvoryUtil implements Listener{
                             	
                             	removeInventoryItems(p.getInventory(), waehrung, price);
                             	
-                            	ItemStack item = new ItemStack(m, amount, nebenID);
-                            	ItemMeta itemmeta = item.getItemMeta();
-                            	
-                            	Map<Enchantment, Integer> enchanments = e.getCurrentItem().getItemMeta().getEnchants();
-                            	
-                            	for(Enchantment ench : enchanments.keySet()) {
-                            		itemmeta.addEnchant(ench, enchanments.get(ench), true);
+                            	if(e.getCurrentItem().getType() == Material.LEATHER_HELMET || e.getCurrentItem().getType() == Material.LEATHER_CHESTPLATE
+                                        || e.getCurrentItem().getType() == Material.LEATHER_LEGGINGS || e.getCurrentItem().getType() == Material.LEATHER_BOOTS){
+                            		ItemStack item = new ItemStack(m,amount,nebenID);
+                                    LeatherArmorMeta itemm = (LeatherArmorMeta) item.getItemMeta();
+
+                                    LeatherArmorMeta im2 = (LeatherArmorMeta)e.getCurrentItem().getItemMeta();
+
+                                    itemm.setColor(im2.getColor());
+
+                                    Map<Enchantment, Integer> enchanments = e.getCurrentItem().getItemMeta().getEnchants();
+
+                                    for(Enchantment ench : enchanments.keySet()){
+                                        itemm.addEnchant(ench, enchanments.get(ench), true);
+                                    }
+                                    item.setItemMeta(itemm);
+                                    p.getInventory().addItem(item);
+                            	}else{
+	                            	ItemStack item = new ItemStack(m, amount, nebenID);
+	                            	ItemMeta itemmeta = item.getItemMeta();
+	                            	
+	                            	Map<Enchantment, Integer> enchanments = e.getCurrentItem().getItemMeta().getEnchants();
+	                            	
+	                            	for(Enchantment ench : enchanments.keySet()) {
+	                            		itemmeta.addEnchant(ench, enchanments.get(ench), true);
+	                            	}
+	                            	item.setItemMeta(itemmeta);
+	                            	p.getInventory().addItem(item);
                             	}
-                            	item.setItemMeta(itemmeta);
-                            	p.getInventory().addItem(item);
                             }else{
                             	p.sendMessage("§cDu hast zu wenig Ressourcen!");
-                            	e.getView().close();
+//                            	openMainInv(p);
                             }
 						}
 					}else

@@ -42,6 +42,21 @@ public class FakePlayer extends Reflections {
             changeSkin();
             this.location = location.clone();
     }
+    
+    public FakePlayer(Location loc, int entityID, GameProfile gameProfile) {
+    	this.entityID = entityID;
+    	this.gameprofile = gameProfile;
+    	changeSkin();
+    	this.location = loc.clone();
+    }
+    
+    public void setEntityID(int id) {
+    	entityID = id;
+    }
+    
+    public GameProfile getProfile() {
+    	return gameprofile;
+    }
    
     public void changeSkin(){
             String value = "eyJ0aW1lc3RhbXAiOjE1MDkyMzc0NjQ4NDksInByb2ZpbGVJZCI6IjMzODllOWFjNDM1MzQxODFiMTAxZTA5NjQxN2M0NTQzIiwicHJvZmlsZU5hbWUiOiJQbGFubG9zZXJKdW5nZSIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7Im1ldGFkYXRhIjp7Im1vZGVsIjoic2xpbSJ9LCJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdjY2IyMDI3NDJjOTc1NTkyM2UyYjc2ZWU4YTc3NzNkMDk3NjNmMDc1NjE0OWE2Y2IyZTllNWVmMDFlYmIifX19";
@@ -112,6 +127,27 @@ public class FakePlayer extends Reflections {
             sendPacket(packet);
             headRotation(location.getYaw(), location.getPitch());
     }
+    
+    public void spawnforPlayer(Player p) {
+    	PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn();
+        
+        setValue(packet, "a", entityID);
+        setValue(packet, "b", gameprofile.getId());
+        setValue(packet, "c", getFixLocation(location.getX()));
+        setValue(packet, "d", getFixLocation(location.getY()));
+        setValue(packet, "e", getFixLocation(location.getZ()));
+        setValue(packet, "f", getFixRotation(location.getYaw()));
+        setValue(packet, "g", getFixRotation(location.getPitch()));
+//        setValue(packet, "g", 90);
+        setValue(packet, "h", 0);
+        DataWatcher w = new DataWatcher(null);
+        w.a(6,(float)20);
+        w.a(10,(byte)127);
+        setValue(packet, "i", w);
+        addToTablistforPlayer(p);
+        sendPacket(packet, p);
+        headRotationforPlayer(p, location.getYaw(), location.getPitch());
+    }
    
     public void teleport(Location location){
             PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
@@ -137,11 +173,28 @@ public class FakePlayer extends Reflections {
             sendPacket(packet);
             sendPacket(packetHead);
     }
+    
+    public void headRotationforPlayer(Player p, float yaw,float pitch){
+        PacketPlayOutEntityLook packet = new PacketPlayOutEntityLook(entityID, getFixRotation(yaw),getFixRotation(pitch) , true);
+        PacketPlayOutEntityHeadRotation packetHead = new PacketPlayOutEntityHeadRotation();
+        setValue(packetHead, "a", entityID);
+        setValue(packetHead, "b", getFixRotation(yaw));
+       
+
+        sendPacket(packet, p);
+        sendPacket(packetHead, p);
+}
    
     public void destroy(){
-            PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(new int[] {entityID});
-            rmvFromTablist();
-            sendPacket(packet);
+        PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(new int[] {entityID});
+        rmvFromTablist();
+        sendPacket(packet);
+    }
+    
+    public void destryforPlayer(Player p) {
+    	PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(new int[] {entityID});
+    	rmvFromTablistforPlayer(p);
+        sendPacket(packet, p);
     }
    
     public void addToTablist(){
@@ -156,6 +209,19 @@ public class FakePlayer extends Reflections {
            
             sendPacket(packet);
     }
+    
+    public void addToTablistforPlayer(Player p){
+        PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
+        PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(gameprofile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(gameprofile.getName())[0]);
+        @SuppressWarnings("unchecked")
+        List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
+        players.add(data);
+       
+        setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER);
+        setValue(packet, "b", players);
+       
+        sendPacket(packet, p);
+}
    
     public void rmvFromTablist(){
             PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
@@ -168,6 +234,19 @@ public class FakePlayer extends Reflections {
             setValue(packet, "b", players);
            
             sendPacket(packet);
+    }
+    
+    public void rmvFromTablistforPlayer(Player p) {
+    	PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
+        PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(gameprofile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(gameprofile.getName())[0]);
+        @SuppressWarnings("unchecked")
+        List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
+        players.add(data);
+       
+        setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER);
+        setValue(packet, "b", players);
+       
+        sendPacket(packet, p);
     }
    
     public int getFixLocation(double pos){

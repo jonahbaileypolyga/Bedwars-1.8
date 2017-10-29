@@ -17,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Bed;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.longhornhdtv.bedwars.main.Main;
 import me.longhornhdtv.bedwars.utils.FakePlayer;
@@ -88,6 +89,14 @@ public class Command_Setup implements CommandExecutor{
 					
 					if(currentMap != null) {
 						fp.spawn();
+						Bukkit.getScheduler().runTaskLater(Main.getPlugin(Main.class), new BukkitRunnable() {
+							
+							@Override
+							public void run() {
+								fp.rmvFromTablist();
+								
+							}
+						}, 6);
 						currentMap.addShopLocation(loc, fp);
 					}else{
 						p.sendMessage("Du musst davor die Map hinzufügen.");

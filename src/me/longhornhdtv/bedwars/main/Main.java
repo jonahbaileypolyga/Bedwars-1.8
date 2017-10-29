@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.longhornhdtv.bedwars.commands.Command_Setup;
+import me.longhornhdtv.bedwars.listeners.DeathEvent;
 import me.longhornhdtv.bedwars.utils.Game;
 import me.longhornhdtv.bedwars.utils.IntenvoryUtil;
 import me.longhornhdtv.bedwars.utils.Map;
@@ -55,7 +56,22 @@ public class Main extends JavaPlugin implements Listener{
 	        IntenvoryUtil.bloecke_price.put(13, 3);
 //	        IntenvoryUtil.bloecke_price.put(14, 4);
 	        IntenvoryUtil.bloecke_price.put(15, 4);
+	        IntenvoryUtil.ruestung_mat.put(9, Material.CLAY_BRICK);
+	        IntenvoryUtil.ruestung_mat.put(10, Material.CLAY_BRICK);
+	        IntenvoryUtil.ruestung_mat.put(11, Material.CLAY_BRICK);
+	        IntenvoryUtil.ruestung_mat.put(14, Material.IRON_INGOT);
+	        IntenvoryUtil.ruestung_mat.put(15, Material.IRON_INGOT);
+	        IntenvoryUtil.ruestung_mat.put(16, Material.IRON_INGOT);
+	        IntenvoryUtil.ruestung_mat.put(17, Material.IRON_INGOT);
+	        IntenvoryUtil.ruestung_price.put(9, 1);
+	        IntenvoryUtil.ruestung_price.put(10, 1);
+	        IntenvoryUtil.ruestung_price.put(11, 1);
+	        IntenvoryUtil.ruestung_price.put(14, 1);
+	        IntenvoryUtil.ruestung_price.put(15, 3);
+	        IntenvoryUtil.ruestung_price.put(16, 5);
+	        IntenvoryUtil.ruestung_price.put(17, 7);
 	        this.getServer().getPluginManager().registerEvents(new IntenvoryUtil(), this);
+	        this.getServer().getPluginManager().registerEvents(new DeathEvent(), this);
 			CCS.sendMessage("§8| §eBedWars §8*  §aIst nun im Developer Modus.");
 			return;
 		}
