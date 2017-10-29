@@ -3,8 +3,11 @@ package me.longhornhdtv.bedwars.commands;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Bed;
 
 import me.longhornhdtv.bedwars.main.Main;
+import me.longhornhdtv.bedwars.utils.FakePlayer;
 import me.longhornhdtv.bedwars.utils.Map;
 import me.longhornhdtv.bedwars.utils.Spawner;
 import me.longhornhdtv.bedwars.utils.SpawnerEnum;
@@ -35,6 +39,7 @@ public class Command_Setup implements CommandExecutor{
 	//setup addMap (Name) (VoteItemID:[MetaID])  - Permission: bw.addMap
 	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels) - Permission: bw.create
 	//setup addTeam (TeamEnum) (maxmale Spieler für das Team) - Permission: bw.addTeam
+	//setup setShop - Permission: bw.setShop
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String lebel, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -70,6 +75,43 @@ public class Command_Setup implements CommandExecutor{
 					return true;
 				}else{
 					p.sendMessage("Du kannst die Lobby nicht in der Luft setzten.");
+					return true;
+				}
+			}else
+			if(args[0].equalsIgnoreCase("setShop")){
+				if(p.hasPermission("bw.setShop")) {
+					Location loc = p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D);
+					loc.setPitch(p.getLocation().getPitch());
+					loc.setYaw(p.getLocation().getYaw());
+					
+					FakePlayer fp = new FakePlayer("§6ALDI", loc);
+					
+					if(currentMap != null) {
+						fp.spawn();
+						currentMap.addShopLocation(loc, fp);
+					}else{
+						p.sendMessage("Du musst davor die Map hinzufügen.");
+						return true;
+					}
+					p.sendMessage("Der Shop wurde gesetzt.");
+					return true;
+				}else{
+					
+					return true;
+				}
+			}else
+			if(args[0].equalsIgnoreCase("setSleep")) {
+				if(currentMap != null) {
+					for(Location loc : currentMap.getShopsLocations().keySet()) {
+						FakePlayer fp = currentMap.getShopsLocations().get(loc);
+						fp.destroy();
+						fp.spawn();
+						fp.sleep(true);
+					}
+					Bukkit.broadcastMessage("Leichen wurden gespawnt.:)");
+					return true;
+				}else{
+					
 					return true;
 				}
 			}else{
@@ -124,16 +166,21 @@ public class Command_Setup implements CommandExecutor{
 					return true;
 				}
 				
-				Team team = currentMap.getTeam(teams);
-				if(team == null) {
+				Team team = null;
+				if(currentMap.getTeam(teams) == null) {
 					p.sendMessage("Du musst zuerst das Team(" + teams.getPrefix() + ") erstellen.");
 					return true;
 				}
+				
+				team = currentMap.getTeam(teams);
 				
 				team.setSpawn(p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D));
 				
 				Main.game.removeMap(currentMap);
 				
+				if(currentMap.getTeams().contains(team)) {
+					currentMap.removeTeam(team);
+				}
 				currentMap.addTeam(team);
 					
 				Main.game.addMap(currentMap);
@@ -152,13 +199,19 @@ public class Command_Setup implements CommandExecutor{
 						p.sendMessage("§eDu musst ein Name von den Teams zwischen( Schwartz Weiß Rot Gelb Grün Lila Orange Blau) auswählen. Benutze /setup addTeam (Team) (Maximale Spieler Anzahl) um eins zu erstellen.");
 						return true;
 					}
-					Team team = currentMap.getTeam(teams);
-					if(team == null) {
+					Team team = null;
+					if(currentMap.getTeam(teams) == null) {
 						p.sendMessage("§eLeider gibt es das angegebende Team(§e" + teams + "§e) nicht auf dieser Welt. Benutze /setup addTeam (Team) (Maximale Spieler Anzahl) um eins zu erstellen.");
 						return true;
 					}
 					
-					currentMap.removeTeam(team);
+					team = currentMap.getTeam(teams);
+					
+					if(currentMap.getTeams().contains(team)) {
+						currentMap.removeTeam(team);
+					}
+					
+//					currentMap.removeTeam(team);
 						
 						//CODE from BedwarsRel
 					HashSet<Material> transparent = new HashSet<Material>();
@@ -255,8 +308,7 @@ public class Command_Setup implements CommandExecutor{
 					return true;
 				}
 				
-				Team team = currentMap.getTeam(teams);
-				if(team == null) {
+				if(currentMap.getTeam(teams) == null) {
 					int maxPlayers = 0;
 					try {
 						maxPlayers = Integer.parseInt(args[2]);
@@ -273,9 +325,19 @@ public class Command_Setup implements CommandExecutor{
 					currentMap.addTeam(new Team(teams, maxPlayers));
 					Main.game.addMap(currentMap);
 					p.sendMessage("Das Team(" + teams.getPrefix() + ") wurde erfolgreich hinzugefügt.");
+////					Map testmap = null;
+//					if(!Main.game.isGameReady) {
+//						for(Map maps : Main.game.getAllMaps()) {
+//							if(maps.getMapName().equalsIgnoreCase(p.getLocation().getWorld().getName())) {
+//								testmap = maps;
+//								break;
+//							}
+//						}
+//					}
+//					p.sendMessage("DEBUG: Teams in Map: " + testmap.getTeams().toString() + " | Map: " + currentMap.getRealMapName() + " | Teams in currentMap: " + currentMap.getTeams().toString());
 					return true;
 				}else{
-					p.sendMessage("Das Team(" + team.getTeamenum().getPrefix() + ") ist schon vorhanden auf dieser Map.");
+					p.sendMessage("Das Team(" + teams.getPrefix() + ") ist schon vorhanden auf dieser Map.");
 					return true;
 				}
 				

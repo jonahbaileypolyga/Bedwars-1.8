@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.longhornhdtv.bedwars.main.Main;
 import me.longhornhdtv.bedwars.utils.Game;
 import me.longhornhdtv.bedwars.utils.GameState;
+import me.longhornhdtv.bedwars.utils.PacketReader;
 
 public class JoinListener implements Listener{
 	
@@ -99,7 +100,17 @@ public class JoinListener implements Listener{
 	
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
+		PacketReader pr = new PacketReader(e.getPlayer());
+		pr.inject();
 		Player p = e.getPlayer();
+		
+		if(Main.game.getGameState().equals(GameState.INGAME)) {
+			if(p.hasPermission(Main.getMainConfig().getString("Config.Supporter-Permission"))){
+				e.setJoinMessage("");
+			}else{
+				p.kickPlayer("");
+			}
+		}
 		
 		if(Main.game.isGameReady) {
 			e.setJoinMessage("§6" + p.getDisplayName() + " §7hat den Server betreten §8(§a" + Bukkit.getServer().getOnlinePlayers().size()+1 + "§8/§a" + Main.game.getMaxPlayers() + "§8)");

@@ -3,6 +3,7 @@ package me.longhornhdtv.bedwars.utils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+//import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -11,10 +12,11 @@ public class Map {
 	
 	private String mapName;
 	private ItemStack voteItem;
-	private ArrayList<Spawner> spawners = new ArrayList<>();
+	private ArrayList<Spawner> spawners;
 	private ArrayList<Team> teams;
 	private String realMapName;
-	private HashMap<Location, Block> changesBlock = new HashMap<>();
+	private HashMap<Location, Block> changesBlock;
+	private HashMap<Location, FakePlayer> shopsLocations;
 	
 //	public Map(String mapName) {
 //		this.mapName = mapName;
@@ -23,6 +25,10 @@ public class Map {
 	public Map(String mapName, String realMapName) {
 		this.mapName = mapName;
 		this.realMapName = realMapName;
+		this.spawners = new ArrayList<>();
+		this.teams = new ArrayList<>();
+		this.changesBlock = new HashMap<>();
+		this.shopsLocations = new HashMap<>();
 	}
 	
 	public void setRealMapName(String mapRealName) {
@@ -73,6 +79,9 @@ public class Map {
 	}
 	
 	public Team getTeam(Teams team) {
+		if(teams == null) {
+			return null;
+		}
 		for(Team teams : this.teams) {
 			if(teams.teamsenum.equals(team)) {
 				return teams;
@@ -89,6 +98,7 @@ public class Map {
 	
 	public void addTeam(Team team) {
 		this.teams.add(team);
+//		Bukkit.broadcastMessage("DEBUG: addMap: " + team.getTeamenum().getPrefix());
 	}
 	
 	public void removeTeam(Team team) {
@@ -101,6 +111,7 @@ public class Map {
 	
 	public ArrayList<Spawner> getAllSpawnerwithSpawnerEnum(SpawnerEnum spawnerEnum) {
 		ArrayList<Spawner> EnumSpawner = new ArrayList<>();
+		if(this.spawners == null) { return null; }
 		for(Spawner spawner : this.spawners) {
 			if(spawner.getSpawnerEnum().equals(spawnerEnum)) {
 				EnumSpawner.add(spawner);
@@ -110,6 +121,7 @@ public class Map {
 	}
 	
 	public Spawner getSpawnerwithSpawnerID(String SpawnerID) {
+		if(this.spawners == null) { return null; }
 		for(Spawner spawner : this.spawners) {
 			if(spawner.getSpawnerID().equalsIgnoreCase(SpawnerID)) {
 				return spawner;
@@ -129,4 +141,17 @@ public class Map {
 	public HashMap<Location, Block> getBloecks() {
 		return this.changesBlock;
 	}
+
+	public HashMap<Location, FakePlayer> getShopsLocations() {
+		return shopsLocations;
+	}
+
+	public void setShopsLocations(HashMap<Location, FakePlayer> shopsLocations) {
+		this.shopsLocations = shopsLocations;
+	}
+	
+	public void addShopLocation(Location loc, FakePlayer fp) {
+		this.shopsLocations.put(loc, fp);
+	}
+	
 }

@@ -1,557 +1,185 @@
 package me.longhornhdtv.bedwars.utils;
 
-import com.google.gson.*;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
-import com.mojang.util.UUIDTypeAdapter;
-import net.md_5.bungee.api.ChatColor;
+import java.util.List;
+import java.util.UUID;
+ 
+import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.DataWatcher;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import net.minecraft.server.v1_8_R3.MathHelper;
+//import net.minecraft.server.v1_8_R3.MobSpawnerAbstract.a;
+import net.minecraft.server.v1_8_R3.PacketPlayOutAnimation;
+import net.minecraft.server.v1_8_R3.PacketPlayOutBed;
+import net.minecraft.server.v1_8_R3.PacketPlayOutEntity.PacketPlayOutEntityLook;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityDestroy;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityEquipment;
+import net.minecraft.server.v1_8_R3.PacketPlayOutEntityHeadRotation;
+import net.minecraft.server.v1_8_R3.PacketPlayOutEntityStatus;
 import net.minecraft.server.v1_8_R3.PacketPlayOutEntityTeleport;
 import net.minecraft.server.v1_8_R3.PacketPlayOutNamedEntitySpawn;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerInfo;
 import net.minecraft.server.v1_8_R3.WorldSettings.EnumGamemode;
-
+ 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+ 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 
-public class FakePlayer {
-	private DataWatcher watcher;
-    private GameProfile profile;
-    private Material chestplate;
-    private boolean hideTablist;
-    private Material leggings;
+public class FakePlayer extends Reflections {
+
+	private int entityID;
     private Location location;
-    private String skinName;
-    private Material inHand;
-    private Material helmet;
-    private Material boots;
-    private String tablist;
-    private int entityID;
-    private String name;
-    public FakePlayer(String skinName, String name, String tablist, int entityID, Location location, Material inHand, boolean hideTablist) {
-        this.location = location;
-        this.tablist = ChatColor.translateAlternateColorCodes('&', tablist);
-        this.name = ChatColor.translateAlternateColorCodes('&', name);
-        this.entityID = entityID;
-        this.inHand = inHand;
-        this.skinName = skinName;
-        this.watcher = new DataWatcher(null);
-        this.hideTablist = hideTablist;
-        watcher.a(6, (float) 20);
+    private GameProfile gameprofile;
+   
+   
+    public FakePlayer(String name,Location location){
+            entityID = (int)Math.ceil(Math.random() * 1000) + 2000;
+            gameprofile = new GameProfile(UUID.randomUUID(), name);
+            changeSkin();
+            this.location = location.clone();
     }
-    public FakePlayer(String name, Location location, boolean hideTablist) {
-        this(null, name, name, new Random().nextInt(10000), location, Material.AIR, hideTablist);
+   
+    public void changeSkin(){
+            String value = "eyJ0aW1lc3RhbXAiOjE1MDkyMzc0NjQ4NDksInByb2ZpbGVJZCI6IjMzODllOWFjNDM1MzQxODFiMTAxZTA5NjQxN2M0NTQzIiwicHJvZmlsZU5hbWUiOiJQbGFubG9zZXJKdW5nZSIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7Im1ldGFkYXRhIjp7Im1vZGVsIjoic2xpbSJ9LCJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdjY2IyMDI3NDJjOTc1NTkyM2UyYjc2ZWU4YTc3NzNkMDk3NjNmMDc1NjE0OWE2Y2IyZTllNWVmMDFlYmIifX19";
+            String signature = "QSR8iu3jNlmKnQzwUortuGlutncHbqY6gcY1aURJ5IW0TaQR2aBeZT3LrivfjTtAZbJ2Ou9hIpB26pk4r0SlkUwdiGvcSzuoDstFeiNU6/jtXOeGo0m2M3eyLm5ySpHIF3q4dn/e/achouGNcN6BHZNbw2WHSJp/kTr+rsC0qgQ0HUnHQZgrRhw9R8ERHnliWFrjG9NWhxInjzQ3PnWDtzvwodlCfxXge76shNlBmTCrv5G6U06sSfysbWgffSHqOZLu9ZIuT6Mh4R/2aKCzuD6vPD5qXdfp/GcPfVa69oLCEDJ3SmZExP62GzZjjo6SxIdOVEccdiHnKG6TzCSxjYPy8hYGs6qMvtjZVMzBKzRszx/ZPrICAkQ/I4aCZcl5oabFBVkrdRNag7llvvwztYe3ddAfW716SYIoctR1c8Ax7quMgPfdfXrOqyFyp9WY/AKFr/yfVg0NYpu6BvV6IS1SQgOj477+JgD9XX8C1jYbJVdOM+1LoZgGeoAaWcVNcJVs5g43YfD2RC/mhmXmG9RVWCiKU8pbv0nk/famcby8jEt3YAQ4SM3FEw1WYwQ05Ej+dMAaSO99fYqFoHtMRpjbp6/WOuO9MUYl0eh43BkJ25uHOMEc2HzdigwX2c2SQaxwRmjTuhHgzy1+4e8Sqrfwd90pJKqGXD4pMFatsUM=";
+            gameprofile.getProperties().put("textures", new Property("textures", value, signature));
     }
-    public FakePlayer(String skinName, String name, Location location, boolean hideTablist) {
-        this(skinName, name, name, new Random().nextInt(10000), location, Material.AIR, hideTablist);
-    }
-    public FakePlayer(String name, Location location, Material inHand, boolean hideTablist) {
-        this(null, name, name, new Random().nextInt(10000), location, inHand, hideTablist);
-    }
-    public FakePlayer(String name, String tablist, Location location, Material inHand, boolean hideTablist) {
-        this(null, name, tablist, new Random().nextInt(10000), location, inHand, hideTablist);
-    }
-    @SuppressWarnings("deprecation")
-    public void spawn() {
-        try{
-            PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn();
-            addToTablist();
+   
+   
+    public void animation(int animation){
+            PacketPlayOutAnimation packet = new PacketPlayOutAnimation();
             setValue(packet, "a", entityID);
-            setValue(packet, "b", this.profile.getId());
-            setValue(packet, "c", toFixedPoint(location.getX()));
-            setValue(packet, "d", toFixedPoint(location.getY()));
-            setValue(packet, "e", toFixedPoint(location.getZ()));
-            setValue(packet, "f", toPackedByte(location.getYaw()));
-            setValue(packet, "g", toPackedByte(location.getPitch()));
-            setValue(packet, "h", inHand == null ? 0 : inHand.getId());
-            setValue(packet, "i", watcher);
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
+            setValue(packet, "b", (byte)animation);
+            sendPacket(packet);
+    }
+   
+    public void status(int status){
+            PacketPlayOutEntityStatus packet = new PacketPlayOutEntityStatus();
+            setValue(packet, "a", entityID);
+            setValue(packet, "b", (byte)status);
+            sendPacket(packet);
+    }
+   
+    public void equip(int slot,ItemStack itemstack){
+            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment();
+            setValue(packet, "a", entityID);
+            setValue(packet, "b", slot);
+            setValue(packet, "c", itemstack);
+            sendPacket(packet);
+    }
+   
+    @SuppressWarnings("deprecation")
+	public void sleep(boolean state){
+            if(state){
+                    Location bedLocation = new Location(location.getWorld(), 1, 1, 1);
+                    PacketPlayOutBed packet = new PacketPlayOutBed();
+                    setValue(packet, "a", entityID);
+                    setValue(packet, "b", new BlockPosition(bedLocation.getX(),bedLocation.getY(),bedLocation.getZ()));
+                   
+                    for(Player pl : Bukkit.getOnlinePlayers()){
+                            pl.sendBlockChange(bedLocation, Material.BED_BLOCK, (byte)0);
+                    }
+
+                    sendPacket(packet);
+                    teleport(location.clone().add(0,0.3,0));
+            }else{
+                    animation(2);
+                    teleport(location.clone().subtract(0,0.3,0));
             }
-            if (hideTablist) removeFromTablist();
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
     }
-    public void despawn() {
-        PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(new int[]{this.entityID});
-        this.removeFromTablist();
-        for(Player online : Bukkit.getOnlinePlayers()) {
-            ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-        }
+   
+    public void spawn(){
+            PacketPlayOutNamedEntitySpawn packet = new PacketPlayOutNamedEntitySpawn();
+           
+            setValue(packet, "a", entityID);
+            setValue(packet, "b", gameprofile.getId());
+            setValue(packet, "c", getFixLocation(location.getX()));
+            setValue(packet, "d", getFixLocation(location.getY()));
+            setValue(packet, "e", getFixLocation(location.getZ()));
+            setValue(packet, "f", getFixRotation(location.getYaw()));
+            setValue(packet, "g", getFixRotation(location.getPitch()));
+//            setValue(packet, "g", 90);
+            setValue(packet, "h", 0);
+            DataWatcher w = new DataWatcher(null);
+            w.a(6,(float)20);
+            w.a(10,(byte)127);
+            setValue(packet, "i", w);
+            addToTablist();
+            sendPacket(packet);
+            headRotation(location.getYaw(), location.getPitch());
     }
-    public void changePlayerlistName(String name) {
-        try{
-            PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME);
-            PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(this.profile, 0, EnumGamemode.NOT_SET, CraftChatMessage.fromString(name)[0]);
-            @SuppressWarnings("unchecked") List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) this.getValue(packet, "b");
-            players.add(data);
-            this.setValue(packet, "b", players);
-            this.tablist = name;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
+   
+    public void teleport(Location location){
+            PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
+            setValue(packet, "a", entityID);
+            setValue(packet, "b", getFixLocation(location.getX()));
+            setValue(packet, "c", getFixLocation(location.getY()));
+            setValue(packet, "d", getFixLocation(location.getZ()));
+            setValue(packet, "e", getFixRotation(location.getYaw()));
+            setValue(packet, "f", getFixRotation(location.getPitch()));
+
+            sendPacket(packet);
+            headRotation(location.getYaw(), location.getPitch());
+            this.location = location.clone();
     }
-    private void addToTablist() {
-        try {
+   
+    public void headRotation(float yaw,float pitch){
+            PacketPlayOutEntityLook packet = new PacketPlayOutEntityLook(entityID, getFixRotation(yaw),getFixRotation(pitch) , true);
+            PacketPlayOutEntityHeadRotation packetHead = new PacketPlayOutEntityHeadRotation();
+            setValue(packetHead, "a", entityID);
+            setValue(packetHead, "b", getFixRotation(yaw));
+           
+
+            sendPacket(packet);
+            sendPacket(packetHead);
+    }
+   
+    public void destroy(){
+            PacketPlayOutEntityDestroy packet = new PacketPlayOutEntityDestroy(new int[] {entityID});
+            rmvFromTablist();
+            sendPacket(packet);
+    }
+   
+    public void addToTablist(){
             PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
-            GameProfile profile = this.profile = this.getProfile();
-            PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(profile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(tablist)[0]);
-            @SuppressWarnings("unchecked") List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
+            PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(gameprofile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(gameprofile.getName())[0]);
+            @SuppressWarnings("unchecked")
+            List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
             players.add(data);
+           
             setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER);
             setValue(packet, "b", players);
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+           
+            sendPacket(packet);
     }
-    private void removeFromTablist() {
-        try{
-            PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER);
-            PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(this.profile, -1, null, null);
-            @SuppressWarnings("unchecked") List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) this.getValue(packet, "b");
+   
+    public void rmvFromTablist(){
+            PacketPlayOutPlayerInfo packet = new PacketPlayOutPlayerInfo();
+            PacketPlayOutPlayerInfo.PlayerInfoData data = packet.new PlayerInfoData(gameprofile, 1, EnumGamemode.NOT_SET, CraftChatMessage.fromString(gameprofile.getName())[0]);
+            @SuppressWarnings("unchecked")
+            List<PacketPlayOutPlayerInfo.PlayerInfoData> players = (List<PacketPlayOutPlayerInfo.PlayerInfoData>) getValue(packet, "b");
             players.add(data);
-            this.setValue(packet, "b", players);
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
+           
+            setValue(packet, "a", PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER);
+            setValue(packet, "b", players);
+           
+            sendPacket(packet);
     }
-    public void teleport(Location location) {
-        try{
-            PacketPlayOutEntityTeleport packet = new PacketPlayOutEntityTeleport();
-            this.setValue(packet, "a", this.entityID);
-            this.setValue(packet, "b", this.toFixedPoint(location.getX()));
-            this.setValue(packet, "c", this.toFixedPoint(location.getY()));
-            this.setValue(packet, "d", this.toFixedPoint(location.getZ()));
-            this.setValue(packet, "e", this.toPackedByte(location.getYaw()));
-            this.setValue(packet, "f", this.toPackedByte(location.getPitch()));
-            this.setValue(packet, "g", this.location.getBlock().getType() != Material.AIR);
-            this.location = location;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
+   
+    public int getFixLocation(double pos){
+            return (int)MathHelper.floor(pos * 32.0D);
     }
-    public void setItemInHand(Material material) {
-        try{
-            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment();
-            this.setValue(packet, "a", this.entityID);
-            this.setValue(packet, "b", 0);
-            this.setValue(packet, "c", material == Material.AIR || material == null ? CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)) : CraftItemStack.asNMSCopy(new ItemStack(material)));
-            this.inHand = material;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public Material getItemInHand() {
-        return this.inHand;
-    }
-    public void setHelmet(Material material) {
-        try{
-            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment();
-            this.setValue(packet, "a", this.entityID);
-            this.setValue(packet, "b", 4);
-            this.setValue(packet, "c", material == Material.AIR || material == null ? CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)) : CraftItemStack.asNMSCopy(new ItemStack(material)));
-            this.helmet = material;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public Material getHelmet() {
-        return this.helmet;
-    }
-    public void setChestplate(Material material) {
-        try{
-            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment();
-            this.setValue(packet, "a", this.entityID);
-            this.setValue(packet, "b", 3);
-            this.setValue(packet, "c", material == Material.AIR || material == null ? CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)) : CraftItemStack.asNMSCopy(new ItemStack(material)));
-            this.chestplate = material;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public Material getChestplate() {
-        return this.chestplate;
-    }
-    public void setLeggings(Material material) {
-        try{
-            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment();
-            this.setValue(packet, "a", this.entityID);
-            this.setValue(packet, "b", 2);
-            this.setValue(packet, "c", material == Material.AIR || material == null ? CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)) : CraftItemStack.asNMSCopy(new ItemStack(material)));
-            this.leggings = material;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public Material getLeggings() {
-        return this.leggings;
-    }
-    public void setBoots(Material material) {
-        try{
-            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment();
-            this.setValue(packet, "a", this.entityID);
-            this.setValue(packet, "b", 1);
-            this.setValue(packet, "c", material == Material.AIR || material == null ? CraftItemStack.asNMSCopy(new ItemStack(Material.AIR)) : CraftItemStack.asNMSCopy(new ItemStack(material)));
-            this.boots = material;
-            for(Player online : Bukkit.getOnlinePlayers()) {
-                ((CraftPlayer) online).getHandle().playerConnection.sendPacket(packet);
-            }
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public Material getBoots() {
-        return this.boots;
-    }
+   
     public int getEntityID() {
-        return this.entityID;
+            return entityID;
     }
-    public UUID getUUID() {
-        return this.profile.getId();
+   
+    public byte getFixRotation(float yawpitch){
+            return (byte) ((int) (yawpitch * 256.0F / 360.0F));
     }
-    public Location getLocation() {
-        return this.location;
-    }
-    public String getName() {
-        return this.name;
-    }
-    public String getPlayerlistName() {
-        return this.tablist;
-    }
-    private void setValue(Object instance, String field, Object value) throws Exception {
-        Field f = instance.getClass().getDeclaredField(field);
-        f.setAccessible(true);
-        f.set(instance, value);
-    }
-    private Object getValue(Object instance, String field) throws Exception {
-        Field f = instance.getClass().getDeclaredField(field);
-        f.setAccessible(true);
-        return f.get(instance);
-    }
-    private int toFixedPoint(double d) {
-        return (int) (d * 32.0);
-    }
-    private byte toPackedByte(float f) {
-        return (byte) ((int) (f * 256.0F / 360.0F));
-    }
-    private GameProfile getProfile() {
-        try {
-            GameProfile profile = GameProfileBuilder.fetch(UUIDFetcher.getUUID(ChatColor.stripColor(this.name)));
-            Field name = profile.getClass().getDeclaredField("name");
-            name.setAccessible(true);
-            name.set(profile, this.name);
-            return profile;
-        } catch (Exception e) {
-            return getFakeProfile();
-        }
-    }
-    private GameProfile getFakeProfile() {
-        try {
-            GameProfile profile = GameProfileBuilder.fetch(UUIDFetcher.getUUID(ChatColor.stripColor(this.skinName)));
-            Field name = profile.getClass().getDeclaredField("name");
-            name.setAccessible(true);
-            name.set(profile, this.name);
-            return profile;
-        } catch (Exception e) {
-            return new GameProfile(UUID.randomUUID(), this.name);
-        }
-    }
-    public static class GameProfileBuilder {
-        private static final String SERVICE_URL = "https://sessionserver.mojang.com/session/minecraft/profile/%s?unsigned=false";
-        private static final String JSON_SKIN = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"}}}";
-        private static final String JSON_CAPE = "{\"timestamp\":%d,\"profileId\":\"%s\",\"profileName\":\"%s\",\"isPublic\":true,\"textures\":{\"SKIN\":{\"url\":\"%s\"},\"CAPE\":{\"url\":\"%s\"}}}";
-        private static Gson gson = new GsonBuilder().disableHtmlEscaping().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).registerTypeAdapter(GameProfile.class, new GameProfileSerializer()).registerTypeAdapter(PropertyMap.class, new PropertyMap.Serializer()).create();
-        private static HashMap<UUID, CachedProfile> cache = new HashMap<UUID, CachedProfile>();
-        private static long cacheTime = -1;
-        /**
-         * Don't run in main thread!
-         *
-         * Fetches the GameProfile from the Mojang servers
-         *
-         * @param uuid The player uuid
-         * @return The GameProfile
-         * @throws IOException If something wents wrong while fetching
-         * @see GameProfile
-         */
-        public static GameProfile fetch(UUID uuid) throws IOException {
-            return fetch(uuid, false);
-        }
-        /**
-         * Don't run in main thread!
-         *
-         * Fetches the GameProfile from the Mojang servers
-         * @param uuid The player uuid
-         * @param forceNew If true the cache is ignored
-         * @return The GameProfile
-         * @throws IOException If something wents wrong while fetching
-         * @see GameProfile
-         */
-        public static GameProfile fetch(UUID uuid, boolean forceNew) throws IOException {
-            if (!forceNew && cache.containsKey(uuid) && cache.get(uuid).isValid()) {
-                return cache.get(uuid).profile;
-            } else {
-                HttpURLConnection connection = (HttpURLConnection) new URL(String.format(SERVICE_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
-                connection.setReadTimeout(5000);
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    String json = new BufferedReader(new InputStreamReader(connection.getInputStream())).readLine();
-                    GameProfile result = gson.fromJson(json, GameProfile.class);
-                    cache.put(uuid, new CachedProfile(result));
-                    return result;
-                } else {
-                    if (!forceNew && cache.containsKey(uuid)) {
-                        return cache.get(uuid).profile;
-                    }
-                    JsonObject error = (JsonObject) new JsonParser().parse(new BufferedReader(new InputStreamReader(connection.getErrorStream())).readLine());
-                    throw new IOException(error.get("error").getAsString() + ": " + error.get("errorMessage").getAsString());
-                }
-            }
-        }
-        /**
-         * Builds a GameProfile for the specified args
-         *
-         * @param uuid The uuid
-         * @param name The name
-         * @param skin The url from the skin image
-         * @return A GameProfile built from the arguments
-         * @see GameProfile
-         */
-        public static GameProfile getProfile(UUID uuid, String name, String skin) {
-            return getProfile(uuid, name, skin, null);
-        }
-        /**
-         * Builds a GameProfile for the specified args
-         *
-         * @param uuid The uuid
-         * @param name The name
-         * @param skinUrl Url from the skin image
-         * @param capeUrl Url from the cape image
-         * @return A GameProfile built from the arguments
-         * @see GameProfile
-         */
-        public static GameProfile getProfile(UUID uuid, String name, String skinUrl, String capeUrl) {
-            GameProfile profile = new GameProfile(uuid, name);
-            boolean cape = capeUrl != null && !capeUrl.isEmpty();
-            List<Object> args = new ArrayList<>();
-            args.add(System.currentTimeMillis());
-            args.add(UUIDTypeAdapter.fromUUID(uuid));
-            args.add(name);
-            args.add(skinUrl);
-            if (cape) args.add(capeUrl);
-            profile.getProperties().put("textures", new Property("textures", Base64Coder.encodeString(String.format(cape ? JSON_CAPE : JSON_SKIN, args.toArray(new Object[args.size()])))));
-            return profile;
-        }
-        /**
-         * Sets the time as long as you want to keep the gameprofiles in cache (-1 = never remove it)
-         * @param time cache time (default = -1)
-         */
-        public static void setCacheTime(long time) {
-            cacheTime = time;
-        }
-        private static class GameProfileSerializer implements JsonSerializer<GameProfile>, JsonDeserializer<GameProfile> {
-            public GameProfile deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
-                JsonObject object = (JsonObject) json;
-                UUID id = object.has("id") ? (UUID) context.deserialize(object.get("id"), UUID.class) : null;
-                String name = object.has("name") ? object.getAsJsonPrimitive("name").getAsString() : null;
-                GameProfile profile = new GameProfile(id, name);
-                if (object.has("properties")) {
-                    for (Entry<String, Property> prop : ((PropertyMap) context.deserialize(object.get("properties"), PropertyMap.class)).entries()) {
-                        profile.getProperties().put(prop.getKey(), prop.getValue());
-                    }
-                }
-                return profile;
-            }
-            public JsonElement serialize(GameProfile profile, Type type, JsonSerializationContext context) {
-                JsonObject result = new JsonObject();
-                if (profile.getId() != null)
-                    result.add("id", context.serialize(profile.getId()));
-                if (profile.getName() != null)
-                    result.addProperty("name", profile.getName());
-                if (!profile.getProperties().isEmpty())
-                    result.add("properties", context.serialize(profile.getProperties()));
-                return result;
-            }
-        }
-        private static class CachedProfile {
-            private long timestamp = System.currentTimeMillis();
-            private GameProfile profile;
-            public CachedProfile(GameProfile profile) {
-                this.profile = profile;
-            }
-            public boolean isValid() {
-                return cacheTime < 0 || (System.currentTimeMillis() - timestamp) < cacheTime;
-            }
-        }
-    }
-    public static class UUIDFetcher {
-        /**
-         * Date when name changes were introduced
-         * @see UUIDFetcher#getUUIDAt(String, long)
-         */
-        public static final long FEBRUARY_2015 = 1422748800000L;
-        private static Gson gson = new GsonBuilder().registerTypeAdapter(UUID.class, new UUIDTypeAdapter()).create();
-        private static final String UUID_URL = "https://api.mojang.com/users/profiles/minecraft/%s?at=%d";
-        private static final String NAME_URL = "https://api.mojang.com/user/profiles/%s/names";
-        private static HashMap<String, UUID> uuidCache = new HashMap<String, UUID>();
-        private static HashMap<UUID, String> nameCache = new HashMap<UUID, String>();
-        private static ExecutorService pool = Executors.newCachedThreadPool();
-        private String name;
-        private UUID id;
-        /**
-         * Fetches the uuid asynchronously and passes it to the consumer
-         *
-         * @param name The name
-         * @param action Do what you want to do with the uuid her
-         */
-        public static void getUUID(final String name, Consumer<UUID> action) {
-            pool.execute(new Acceptor<UUID>(action) {
-                @Override
-                public UUID getValue() {
-                    return getUUID(name);
-                }
-            });
-        }
-        /**
-         * Fetches the uuid synchronously and returns it
-         *
-         * @param name The name
-         * @return The uuid
-         */
-        public static UUID getUUID(String name) {
-            return getUUIDAt(name, System.currentTimeMillis());
-        }
-        /**
-         * Fetches the uuid synchronously for a specified name and time and passes the result to the consumer
-         *
-         * @param name The name
-         * @param timestamp Time when the player had this name in milliseconds
-         * @param action Do what you want to do with the uuid her
-         */
-        public static void getUUIDAt(final String name, final long timestamp, Consumer<UUID> action) {
-            pool.execute(new Acceptor<UUID>(action) {
-                @Override
-                public UUID getValue() {
-                    return getUUIDAt(name, timestamp);
-                }
-            });
-        }
-        /**
-         * Fetches the uuid synchronously for a specified name and time
-         *
-         * @param name The name
-         * @param timestamp Time when the player had this name in milliseconds
-         * @see UUIDFetcher#FEBRUARY_2015
-         */
-        public static UUID getUUIDAt(String name, long timestamp) {
-            name = name.toLowerCase();
-            if (uuidCache.containsKey(name)) {
-                return uuidCache.get(name);
-            }
-            try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(String.format(UUID_URL, name, timestamp/1000)).openConnection();
-                connection.setReadTimeout(5000);
-                UUIDFetcher data = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher.class);
-                uuidCache.put(name, data.id);
-                nameCache.put(data.id, data.name);
-                return data.id;
-            } catch (Exception e) { }
-            return null;
-        }
-        /**
-         * Fetches the name asynchronously and passes it to the consumer
-         *
-         * @param uuid The uuid
-         * @param action Do what you want to do with the name her
-         */
-        public static void getName(final UUID uuid, Consumer<String> action) {
-            pool.execute(new Acceptor<String>(action) {
-                @Override
-                public String getValue() {
-                    return getName(uuid);
-                }
-            });
-        }
-        /**
-         * Fetches the name synchronously and returns it
-         *
-         * @param uuid The uuid
-         * @return The name
-         */
-        public static String getName(UUID uuid) {
-            if (nameCache.containsKey(uuid)) {
-                return nameCache.get(uuid);
-            }
-            try {
-                HttpURLConnection connection = (HttpURLConnection) new URL(String.format(NAME_URL, UUIDTypeAdapter.fromUUID(uuid))).openConnection();
-                connection.setReadTimeout(5000);
-                UUIDFetcher[] nameHistory = gson.fromJson(new BufferedReader(new InputStreamReader(connection.getInputStream())), UUIDFetcher[].class);
-                UUIDFetcher currentNameData = nameHistory[nameHistory.length - 1];
-                uuidCache.put(currentNameData.name.toLowerCase(), uuid);
-                nameCache.put(uuid, currentNameData.name);
-                return currentNameData.name;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-        public static interface Consumer<T> {
-            void accept(T t);
-        }
-        public static abstract class Acceptor<T> implements Runnable {
-            private Consumer<T> consumer;
-            public Acceptor(Consumer<T> consumer) {
-                this.consumer = consumer;
-            }
-            public abstract T getValue();
-            @Override
-            public void run() {
-                consumer.accept(getValue());
-            }
-        }
-    }
+   
 }

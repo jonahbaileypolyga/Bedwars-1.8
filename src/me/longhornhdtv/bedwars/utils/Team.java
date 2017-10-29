@@ -13,12 +13,13 @@ public class Team {
 	Block bedHead;
 	Block bedBack;
 	int maxTeamSize;
-	ArrayList<Player> playersinteam = new ArrayList<>();
+	ArrayList<Player> playersinteam;
 	
 	
 	public Team(Teams teamenum, int maxTeeamSize) {
 		this.teamsenum = teamenum;
 		this.maxTeamSize = maxTeeamSize;
+		this.playersinteam = new ArrayList<>();
 	}
 	
 	public Team(Teams teameunm, Location spawn, Block bedLocHead, Block bedLocBack, int maxTeamSize) {
@@ -27,6 +28,7 @@ public class Team {
 		this.bedHead = bedLocHead;
 		this.bedBack = bedLocBack;
 		this.maxTeamSize = maxTeamSize;
+		this.playersinteam = new ArrayList<>();
 	}
 	
 	public void setSpawn(Location spawn) {

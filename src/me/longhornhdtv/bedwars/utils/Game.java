@@ -3,6 +3,7 @@ package me.longhornhdtv.bedwars.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
 
@@ -121,6 +122,24 @@ public class Game {
 					Bukkit.broadcastMessage(Main.getPrefix() + "§eMap konnte nicht hinzugefüt werden, weil kein VoteItem gesetzt wurde.");
 					return;
 				}
+				
+				if(map.getTeams() != null) {
+					for(Team team : map.getTeams()) {
+						map2.addTeam(team);
+					}
+				}
+				
+				if(map.getAllSpawnerfromtheMap() != null) {
+					for(Spawner spawner : map.getAllSpawnerfromtheMap()) {
+						map2.addSpawner(spawner);
+					}
+				}
+				
+				if(map.getShopsLocations() == null) {
+					HashMap<Location, FakePlayer> lfp = map.getShopsLocations();
+					map2.setShopsLocations(lfp);
+				}
+				
 				maps.add(map2);
 				Bukkit.broadcastMessage(Main.getPrefix() + "§aMap wurde erfolgreich hinzugefügt.");
 				return;

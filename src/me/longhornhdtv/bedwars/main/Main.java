@@ -9,17 +9,24 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.WorldCreator;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.longhornhdtv.bedwars.commands.Command_Setup;
 import me.longhornhdtv.bedwars.utils.Game;
+import me.longhornhdtv.bedwars.utils.IntenvoryUtil;
 import me.longhornhdtv.bedwars.utils.Map;
+import me.longhornhdtv.bedwars.utils.PacketReader;
 
-public class Main extends JavaPlugin{
+public class Main extends JavaPlugin implements Listener{
 		
 	public static ConsoleCommandSender CCS = Bukkit.getConsoleSender();
 	private static String prefix = "§8| §eBedWars §8* ";
@@ -36,7 +43,19 @@ public class Main extends JavaPlugin{
 		if(isDebug) {
 //			this.getCommand("Bedwars").setExecutor(new MainCommand());
 			game = new Game(GameFile);
+			this.getServer().getPluginManager().registerEvents(this, this);
 			this.getCommand("setup").setExecutor(new Command_Setup());
+	        IntenvoryUtil.bloecke_mat.put(11, Material.CLAY_BRICK);
+	        IntenvoryUtil.bloecke_mat.put(12, Material.CLAY_BRICK);
+	        IntenvoryUtil.bloecke_mat.put(13, Material.IRON_INGOT);
+//	        IntenvoryUtil.bloecke_mat.put(14, Material.CLAY_BRICK);
+	        IntenvoryUtil.bloecke_mat.put(15, Material.CLAY_BRICK);
+	        IntenvoryUtil.bloecke_price.put(11, 1);
+	        IntenvoryUtil.bloecke_price.put(12, 7);
+	        IntenvoryUtil.bloecke_price.put(13, 3);
+//	        IntenvoryUtil.bloecke_price.put(14, 4);
+	        IntenvoryUtil.bloecke_price.put(15, 4);
+	        this.getServer().getPluginManager().registerEvents(new IntenvoryUtil(), this);
 			CCS.sendMessage("§8| §eBedWars §8*  §aIst nun im Developer Modus.");
 			return;
 		}
@@ -59,6 +78,16 @@ public class Main extends JavaPlugin{
 			this.cfg = cfg;
 		}
 		game = new Game(GameFile);
+        IntenvoryUtil.bloecke_mat.put(11, Material.CLAY_BRICK);
+        IntenvoryUtil.bloecke_mat.put(12, Material.CLAY_BRICK);
+        IntenvoryUtil.bloecke_mat.put(13, Material.IRON_INGOT);
+//        IntenvoryUtil.bloecke_mat.put(14, Material.CLAY_BRICK);
+        IntenvoryUtil.bloecke_mat.put(15, Material.CLAY_BRICK);
+        IntenvoryUtil.bloecke_price.put(11, 1);
+        IntenvoryUtil.bloecke_price.put(12, 7);
+        IntenvoryUtil.bloecke_price.put(13, 3);
+//        IntenvoryUtil.bloecke_price.put(14, 4);
+        IntenvoryUtil.bloecke_price.put(15, 4);
 		CCS.sendMessage("§8| §eBedWars §8*  §aWurde geladen und Aktiviert !");
 	}
 
@@ -68,6 +97,19 @@ public class Main extends JavaPlugin{
 		
 		
 		
+	}
+	
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		PacketReader pr = new PacketReader(e.getPlayer());
+		pr.inject();
+		e.setJoinMessage("§6TestJoin Massge: Player: " + e.getPlayer().getDisplayName());
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e) {
+		PacketReader pr = new PacketReader(e.getPlayer());
+		pr.uninject();
 	}
 	
 	public static void reloadCustomConfig() {
