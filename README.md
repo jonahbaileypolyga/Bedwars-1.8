@@ -1,6 +1,10 @@
 # Bedwars-1.8
 This is are Bedwars 1.8 Plugin.
 
+## WARNING
+This is are __Alpha__ Version!!!
+If you want to look the changes, you must be change the Branch to __Updates_to_simple_Bedwars__.
+
 ## Built With
 
 * [Eclipse](https://www.eclipse.org/documentation/) - The Javacode editor
