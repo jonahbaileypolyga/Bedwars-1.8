@@ -31,16 +31,15 @@ public class Command_Setup implements CommandExecutor{
 	
 	private Map currentMap = null;
 	
-	//setup setHub
 	@SuppressWarnings("deprecation")
 	//setup setSpawnPosition (Team)
 	//setup setBed (Team)
 	//setup setSpawner (Gold,Silver,Bronzer)
 	//setup setLobby
-	//setup addMap (Name) (VoteItemID:[MetaID])  - Permission: bw.addMap
-	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels) - Permission: bw.create
-	//setup addTeam (TeamEnum) (maxmale Spieler für das Team) - Permission: bw.addTeam
-	//setup setShop - Permission: bw.setShop
+	//setup addMap (Name) (VoteItemID:[MetaID])  - Permission: griffix.addMap
+	//setup createGame (Anzahl der Maximalen Spieler) (Name des Spiels) - Permission: griffix.creator
+	//setup addTeam (TeamEnum) (maxmale Spieler für das Team) - Permission: griffix.addTeam
+	//setup setShop - Permission: griffix.setShop
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String lebel, String[] args) {
 		if(!(sender instanceof Player)) {
@@ -61,8 +60,11 @@ public class Command_Setup implements CommandExecutor{
 			p.sendMessage("§e/setup createGame [maxPlayers] [Name des Spieles] erstelle den Server.");
 			p.sendMessage("§e/setup addMap [MapName] [VoteItem] um eine Map zu erstellen §c!Achte darauf das du dich in der Map befinden musst!§e. ");
 			p.sendMessage("§e/setup setlobby setze den Lobby Spawn.");
+			p.sendMessage("§e/setup setTeamVote um den TeamVote PLayer zu setzen.");
+			p.sendMessage("§e/setup addTeam [TeamColor §cEnglish§e] [TeamGröße] um ein Team zu adden.");
 			p.sendMessage("§e/setup setSpawnPosition [TeamFarbe  Schwartz,Weiß,Rot,Gelb,Grün,Lila,Orange,Blau] um den Teamspawn zu setzen.");
 			p.sendMessage("§e/setup setBed [TeamFarbe] um das Bett zu setzen.");
+			p.sendMessage("§e/setup setShop um eine Shop zu setzen.");
 			p.sendMessage("§e/setup setSpawner [Bronze,Silver,Gold] um die Spawner zu setzen.");
 			p.sendMessage("");
 			p.sendMessage("§e-------Setup-End-------");
@@ -72,15 +74,15 @@ public class Command_Setup implements CommandExecutor{
 			if(args[0].equalsIgnoreCase("setLobby")) {
 				if(p.getLocation().getBlock().getType() == Material.AIR){
 					Main.game.lobbyLocation = p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D);
-					p.sendMessage("Du hast erfolgreich die Lobby gesetzt.");
+					p.sendMessage("§eDu hast erfolgreich die Lobby gesetzt.");
 					return true;
 				}else{
-					p.sendMessage("Du kannst die Lobby nicht in der Luft setzten.");
+					p.sendMessage("§eDu kannst die Lobby nicht in der Luft setzten.");
 					return true;
 				}
 			}else
 			if(args[0].equalsIgnoreCase("setShop")){
-				if(p.hasPermission("bw.setShop")) {
+				if(p.hasPermission("griffix.setShop")) {
 					Location loc = p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D);
 					loc.setPitch(p.getLocation().getPitch());
 					loc.setYaw(p.getLocation().getYaw());
@@ -99,10 +101,10 @@ public class Command_Setup implements CommandExecutor{
 						}, 6);
 						currentMap.addShopLocation(loc, fp);
 					}else{
-						p.sendMessage("Du musst davor die Map hinzufügen.");
+						p.sendMessage("§eDu musst davor die Map hinzufügen.");
 						return true;
 					}
-					p.sendMessage("Der Shop wurde gesetzt.");
+					p.sendMessage("§eDer Shop wurde gesetzt.");
 					return true;
 				}else{
 					
@@ -138,7 +140,7 @@ public class Command_Setup implements CommandExecutor{
 						}
 					}
 					if(se == null) {
-						p.sendMessage("Leider gibt es kein Spawner mit dem Name(" + args[1] + ").");
+						p.sendMessage("§eLeider gibt es kein Spawner mit dem Name(" + args[1] + ").");
 						return true;
 					}
 					Spawner s = new Spawner(se, p.getLocation().getBlock().getLocation().add(0.5D, 0.0D, 0.5D));
@@ -151,7 +153,7 @@ public class Command_Setup implements CommandExecutor{
 					
 					Main.game.addMap(currentMap);
 				
-					p.sendMessage("Du hast erfolgreich den Spawner(" + args[1].toUpperCase() + ") hinzugefügt.");
+					p.sendMessage("§eDu hast erfolgreich den Spawner(" + args[1].toUpperCase() + ") hinzugefügt.");
 					return true;
 				}else{
 					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
@@ -177,7 +179,7 @@ public class Command_Setup implements CommandExecutor{
 				
 				Team team = null;
 				if(currentMap.getTeam(teams) == null) {
-					p.sendMessage("Du musst zuerst das Team(" + teams.getPrefix() + ") erstellen.");
+					p.sendMessage("§eDu musst zuerst das Team(" + teams.getPrefix() + ") erstellen.");
 					return true;
 				}
 				
@@ -301,7 +303,7 @@ public class Command_Setup implements CommandExecutor{
 					p.sendMessage("§eDu musst noch eine Karte hinzufügen auf der du bist oder ein Spiel erstellen.");
 					return true;
 				}
-				if(!p.hasPermission("bw.addTeam")) {
+				if(!p.hasPermission("griffix.addTeam")) {
 					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
 					return true;
 				}
@@ -322,18 +324,18 @@ public class Command_Setup implements CommandExecutor{
 					try {
 						maxPlayers = Integer.parseInt(args[2]);
 					} catch(Exception e) {
-						p.sendMessage("Du musst eine Zahl eingeben bei Maximaler Spielranzahl für das Spiel.");
+						p.sendMessage("§eDu musst eine Zahl eingeben bei Maximaler Spielranzahl für das Spiel.");
 						return true;
 					}
 					
 					if(maxPlayers == 0) {
-						p.sendMessage("Du kannst dem Team nicht die Maximale Spieleranzahl auf 0 stellen.");
+						p.sendMessage("§eDu kannst dem Team nicht die Maximale Spieleranzahl auf 0 stellen.");
 						return true;
 					}
 					Main.game.removeMap(currentMap);
 					currentMap.addTeam(new Team(teams, maxPlayers));
 					Main.game.addMap(currentMap);
-					p.sendMessage("Das Team(" + teams.getPrefix() + ") wurde erfolgreich hinzugefügt.");
+					p.sendMessage("§eDas Team(" + teams.getPrefix() + "§e) wurde erfolgreich hinzugefügt.");
 ////					Map testmap = null;
 //					if(!Main.game.isGameReady) {
 //						for(Map maps : Main.game.getAllMaps()) {
@@ -346,13 +348,13 @@ public class Command_Setup implements CommandExecutor{
 //					p.sendMessage("DEBUG: Teams in Map: " + testmap.getTeams().toString() + " | Map: " + currentMap.getRealMapName() + " | Teams in currentMap: " + currentMap.getTeams().toString());
 					return true;
 				}else{
-					p.sendMessage("Das Team(" + teams.getPrefix() + ") ist schon vorhanden auf dieser Map.");
+					p.sendMessage("§eDas Team(" + teams.getPrefix() + "§e) ist schon vorhanden auf dieser Map.");
 					return true;
 				}
 				
 			}else
 			if(args[0].equalsIgnoreCase("addMap")) {
-				if(!p.hasPermission("bw.addMap")) {
+				if(!p.hasPermission("griffix.addMap")) {
 					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
 					return true;
 				}
@@ -392,7 +394,7 @@ public class Command_Setup implements CommandExecutor{
 				}
 			}
 			if(args[0].equalsIgnoreCase("createGame")) {
-				if(!p.hasPermission("bw.create")) {
+				if(!p.hasPermission("griffix.creator")) {
 					p.sendMessage("§7Du hast keine Rechte auf diesem Befehl§8!");
 					return true;
 				}
@@ -409,7 +411,7 @@ public class Command_Setup implements CommandExecutor{
 						}
 						Main.game.setMaxPlayers(maxPlayers);
 						Main.game.setGameName(name);
-						p.sendMessage(Main.getPrefix() + "§eDu hast erfolgreich das Spiel mit dem Namen (" + name + ") erstellt!");
+						p.sendMessage(Main.getPrefix() + "§eDu hast erfolgreich das Spiel mit dem Namen (" + name + "§e) erstellt!");
 						return true;
 					}else{
 						if(!Main.GameFile.exists()) {
