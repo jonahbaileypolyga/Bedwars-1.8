@@ -241,12 +241,12 @@ public class Game {
 			ArrayList<Map> breakMaps = new ArrayList<>();
 			for(Map map : this.maps) {
 				if(Bukkit.getWorld(map.getRealMapName()) == null) {
-					p.sendMessage("§eFür die Map(" + map.getMapName() + ") wurde keine Karte gefunden. Und wird entfernt.");
+					p.sendMessage("§eFür die Map(" + map.getMapName() + "§e) wurde keine Karte gefunden. Und wird entfernt.");
 					check = false;
 					continue;
 				}
 				if(map.getAllSpawnerfromtheMap().size() == 0) {
-					p.sendMessage("§eDie Map(" + map.getMapName() + ") hat keine Spawner.");
+					p.sendMessage("§eDie Map(" + map.getMapName() + "§e) hat keine Spawner.");
 					if(!breakMaps.contains(map)) {
 						breakMaps.add(map);
 					}
@@ -254,7 +254,7 @@ public class Game {
 					continue;
 				}
 				if(map.getTeams().size() == 0) {
-					p.sendMessage("§eDie Map(" + map.getMapName() + ") hat keine Teams.");
+					p.sendMessage("§eDie Map(" + map.getMapName() + "§e) hat keine Teams.");
 					if(!breakMaps.contains(map)) {
 						breakMaps.add(map);
 					}
@@ -281,13 +281,13 @@ public class Game {
 			for(Map map : this.maps) {
 				for(Team team : map.getTeams()) {
 					if(team.getSpawn() == null) {
-						p.sendMessage("§eDas Team(" + team.getTeamenum().getPrefix() + ") hat kein Spawn. Team wurde entfernt.");
+						p.sendMessage("§eDas Team(" + team.getTeamenum().getPrefix() + "§e) hat kein Spawn. Team wurde entfernt.");
 						check = false;
 						breakMaps2.add(map);
 						continue;
 					}
 					if(team.getBedBack() == null || team.getBedHead() == null) {
-						p.sendMessage("§eDas Team(" + team.getTeamenum().getPrefix() + ") hat kein Bed. Team wurde entfernt.");
+						p.sendMessage("§eDas Team(" + team.getTeamenum().getPrefix() + "§e) hat kein Bed. Team wurde entfernt.");
 						check = false;
 						breakMaps2.add(map);
 						continue;
@@ -364,17 +364,17 @@ public class Game {
 			}
 			
 			if(this.name == "" || this.name == null) {
-				p.sendMessage("Du musst zuerst ein Spiel erstellen. Oder es neu erstellen.");
+				p.sendMessage("§cDu musst zuerst ein Spiel erstellen. Oder es neu erstellen.");
 				return false;
 			}
 			
 		if(this.maxPlayers == 0) {
-			p.sendMessage("Du hast keine Maximale Spieleranzahl eingegen. Bitte erstelle das Spiel neu.");
+			p.sendMessage("§cDu hast keine Maximale Spieleranzahl eingegen. Bitte erstelle das Spiel neu.");
 			return false;
 		}
 		
 		if(this.lobbyLocation == null) {
-			p.sendMessage("Du hast kein Lobby-Spawn gesetzt.");
+			p.sendMessage("§cDu hast kein Lobby-Spawn gesetzt.");
 			return false;
 		}
 		
